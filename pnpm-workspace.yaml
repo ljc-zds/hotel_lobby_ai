@@ -1,0 +1,6 @@
+verifyDepsBeforeRun: false
+allowBuilds:
+  esbuild: true
+  msw: false
+  sharp: true
+  workerd: true

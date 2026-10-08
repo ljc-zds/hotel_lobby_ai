@@ -841,5 +841,16 @@
   "landing.blog.title": "From the blog",
   "landing.blog.description": "Product updates, guides, and engineering notes from the team.",
   "landing.blog.view_all": "View all posts",
-  "landing.footer.blog": "Blog"
+  "landing.footer.blog": "Blog",
+  "hotel.nav.generator": "Generator",
+  "hotel.nav.templates": "Templates",
+  "hotel.nav.prompts": "Prompts",
+  "hotel.nav.pricing": "Pricing",
+  "hotel.nav.what": "What is it?",
+  "hotel.nav.blog": "Blog",
+  "hotel.nav.about": "About",
+  "hotel.nav.contact": "Contact",
+  "hotel.nav.videos": "My videos",
+  "hotel.nav.account": "Account",
+  "hotel.nav.credits": "Demo credits"
 }

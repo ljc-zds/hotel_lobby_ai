@@ -1,0 +1,1 @@
+Observed: nav anchors; template category filtering; preview video modal close/choose; resolution buttons; photo swap; sign-in gate; FAQ disclosure. Responsive reference CSS breakpoint rules preserved. Demo adaptations: local-only uploads and simulated jobs, no actual AI/payment.

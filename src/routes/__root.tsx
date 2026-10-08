@@ -23,10 +23,10 @@ import { GoogleOneTap } from '@/components/google-one-tap';
 import { SandboxPreviewBridge } from '@/components/sandbox-preview-bridge';
 import { Toaster } from '@/components/ui/sonner';
 
-import '@fontsource-variable/inter';
-import '@fontsource/libre-baskerville/400.css';
-import '@fontsource/libre-baskerville/700.css';
-import '@fontsource/libre-baskerville/400-italic.css';
+import '@fontsource-variable/space-grotesk';
+import '@fontsource/ibm-plex-sans/400.css';
+import '@fontsource/ibm-plex-sans/500.css';
+import '@fontsource/ibm-plex-sans/600.css';
 import '@/styles/globals.css';
 
 // Analytics IDs live in the DB config (1h-cached service). Fetched via a
@@ -76,6 +76,10 @@ export const Route = createRootRoute({
       links: [
         { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },
         { rel: 'apple-touch-icon', href: '/favicon.svg' },
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+SC:wght@400;600;700;900&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap',
+        },
         ...locales.map((loc) => ({
           rel: 'alternate',
           hrefLang: loc,
@@ -97,8 +101,9 @@ function RootComponent() {
     <QueryClientProvider client={getQueryClient()}>
       <ThemeProvider
         attribute="class"
-        defaultTheme="system"
-        enableSystem
+        defaultTheme="light"
+        forcedTheme="light"
+        enableSystem={false}
         disableTransitionOnChange
       >
         <Outlet />

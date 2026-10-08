@@ -841,5 +841,16 @@
   "landing.blog.title": "最新博客",
   "landing.blog.description": "来自团队的产品动态、使用指南与工程笔记。",
   "landing.blog.view_all": "查看全部文章",
-  "landing.footer.blog": "博客"
+  "landing.footer.blog": "博客",
+  "hotel.nav.generator": "生成器",
+  "hotel.nav.templates": "模板",
+  "hotel.nav.prompts": "提示词",
+  "hotel.nav.pricing": "价格",
+  "hotel.nav.what": "这是什么？",
+  "hotel.nav.blog": "博客",
+  "hotel.nav.about": "关于",
+  "hotel.nav.contact": "联系",
+  "hotel.nav.videos": "我的视频",
+  "hotel.nav.account": "账户",
+  "hotel.nav.credits": "演示积分"
 }

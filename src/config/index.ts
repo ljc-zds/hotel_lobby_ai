@@ -16,8 +16,9 @@ const publicEnv = (key: string) => metaEnv[key] ?? procEnv[key];
 export const envConfigs: Record<string, string> = {
   // App (public)
   app_url: publicEnv('VITE_APP_URL') ?? 'http://localhost:3000',
-  app_name: publicEnv('VITE_APP_NAME') ?? 'ShipAny',
-  app_description: publicEnv('VITE_APP_DESCRIPTION') ?? 'Ship your SaaS faster',
+  app_name: publicEnv('VITE_APP_NAME') ?? 'HotelLobby.ai',
+  app_description:
+    publicEnv('VITE_APP_DESCRIPTION') ?? '两张照片，一次原创发布。',
   app_logo: publicEnv('VITE_APP_LOGO') ?? '/logo.svg',
 
   // Database

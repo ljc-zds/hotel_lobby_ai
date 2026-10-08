@@ -27,6 +27,7 @@ export function LocaleSelector({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
+        aria-label={locale === 'zh' ? '切换语言' : 'Switch language'}
         className={cn(
           'inline-flex items-center transition-colors outline-none',
           variant === 'icon'

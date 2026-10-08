@@ -6,8 +6,7 @@ import { Link } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
 import { m } from '@/paraglide/messages.js';
 import { getLocale, localizeUrl } from '@/paraglide/runtime.js';
-import { Footer } from '@/blocks/footer';
-import { Header } from '@/blocks/header';
+import { HotelSite } from '@/blocks/hotel-site';
 import { MarkdownContent } from '@/components/markdown-content';
 import { mdxComponents } from '@/components/mdx-components';
 import { formatPostDate, loadLocalPost } from '@/content/posts';
@@ -48,10 +47,9 @@ function BlogPostPage() {
     post.source === 'local' ? loadLocalPost(post.slug, locale)?.default : null;
 
   return (
-    <div className="bg-background text-foreground flex min-h-screen flex-col">
-      <Header />
-      <main className="flex-1 px-6 py-12 md:px-8 md:py-16">
-        <article className="mx-auto max-w-3xl">
+    <HotelSite page="content">
+      <div className="flex-1 px-6 py-12 md:px-8 md:py-16">
+        <article className="hotel-content-article mx-auto max-w-3xl">
           <Link
             href="/blog"
             className="text-muted-foreground hover:text-foreground inline-flex items-center gap-2 text-sm font-medium transition-colors"
@@ -107,8 +105,7 @@ function BlogPostPage() {
             <MarkdownContent content={post.content || ''} />
           )}
         </article>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </HotelSite>
   );
 }

@@ -71,7 +71,7 @@ function StaticPage() {
   const Content = page.default;
 
   return (
-    <article>
+    <article className="hotel-content-article">
       <header className="border-border mb-6 border-b pb-5">
         <h1 className="text-foreground text-3xl font-semibold tracking-tight md:text-4xl">
           {meta.title}

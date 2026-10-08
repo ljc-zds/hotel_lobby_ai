@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 
 import { Link } from '@/core/i18n/navigation';
 import { m } from '@/paraglide/messages.js';
+import { HotelSite } from '@/blocks/hotel-site';
 import { mdxComponents } from '@/components/mdx-components';
 
 export const Route = createFileRoute('/(pages)')({
@@ -12,7 +13,7 @@ export const Route = createFileRoute('/(pages)')({
 
 function PagesLayout() {
   return (
-    <div className="bg-background min-h-screen">
+    <HotelSite page="content">
       <div className="mx-auto max-w-3xl px-6 pt-8 md:px-8">
         <Link
           href="/"
@@ -27,6 +28,6 @@ function PagesLayout() {
           <Outlet />
         </MDXProvider>
       </div>
-    </div>
+    </HotelSite>
   );
 }

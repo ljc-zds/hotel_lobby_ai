@@ -23,7 +23,6 @@ import { getLocale } from '@/paraglide/runtime.js';
 import { HotelGallery } from '@/blocks/hotel-gallery';
 import { HotelGenerator } from '@/blocks/hotel-generator';
 import { getHotelTracks } from '@/blocks/hotel-tracks';
-import { BuiltWithShipAny } from '@/components/built-with-shipany';
 import { LocaleSelector } from '@/components/locale-selector';
 
 import '@/styles/hotel.css';
@@ -611,7 +610,6 @@ export function HotelSite({
             © 2026 {envConfigs.app_name}
             {m['hotel.copy.template_demo_084']()}
           </span>
-          <BuiltWithShipAny />
         </div>
       </footer>
     </div>

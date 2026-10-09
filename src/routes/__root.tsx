@@ -70,6 +70,10 @@ export const Route = createRootRoute({
       meta: [
         { charSet: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        {
+          name: 'google-site-verification',
+          content: 'fvZxM7N9yTV5HKoM-fVGcD8wBZhUJv_AaFFenSYVCC8',
+        },
         { title: envConfigs.app_name },
         { name: 'description', content: envConfigs.app_description },
         { property: 'og:site_name', content: envConfigs.app_name },

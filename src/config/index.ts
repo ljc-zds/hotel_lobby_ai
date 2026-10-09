@@ -20,6 +20,7 @@ export const envConfigs: Record<string, string> = {
   app_description:
     publicEnv('VITE_APP_DESCRIPTION') ?? '两张照片，一次原创发布。',
   app_logo: publicEnv('VITE_APP_LOGO') ?? '/logo.svg',
+  google_analytics_id: procEnv.GOOGLE_ANALYTICS_ID ?? '',
 
   // Database
   database_url: procEnv.DATABASE_URL ?? '',

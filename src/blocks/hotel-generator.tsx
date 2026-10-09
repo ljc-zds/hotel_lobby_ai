@@ -10,6 +10,7 @@ import {
   X,
 } from 'lucide-react';
 
+import { Link } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
 import { m } from '@/paraglide/messages.js';
 
@@ -129,6 +130,9 @@ export function HotelGenerator({
               {m['hotel.generator.heading']({ app: envConfigs.app_name })}
             </h2>
             <p>{m['hotel.copy.choose_a_scene_add_two_photos_093']()}</p>
+            <p className="privacy-note">
+              {m['hotel.generator.model_disclosure']()}
+            </p>
           </div>
           <div className="selected-template-mini">
             <img src={selected.image} alt="" />
@@ -345,6 +349,15 @@ export function HotelGenerator({
             </button>
             <p className="studio-foot">
               {m['hotel.copy.add_two_photos_and_confirm_permission_117']()}
+            </p>
+            <p className="studio-foot">
+              <Link href="/terms-of-service">
+                {m['hotel.generator.content_standards']()}
+              </Link>
+              {' · '}
+              <a href="mailto:2670855280@qq.com?subject=HotelLobby%20Content%20Report">
+                {m['hotel.generator.report_content']()}
+              </a>
             </p>
             <p role="status" aria-live="polite" className="privacy-note">
               {result}

@@ -966,7 +966,7 @@
   "hotel.copy.compare_the_credits_for_each_resolution_108": "Compare the credits for each resolution",
   "hotel.copy.video_resolution_109": "Video resolution",
   "hotel.copy.credits_110": "credits",
-  "hotel.copy.i_have_permission_to_use_these_111": "I have permission to use these photos and the consent of everyone pictured.",
+  "hotel.copy.i_have_permission_to_use_these_111": "I have permission and the consent of everyone pictured, and my photos comply with the content standards.",
   "hotel.copy.selected_resolution_112": "Selected resolution",
   "hotel.copy.template_credits_113": "Template credits",
   "hotel.copy.the_demo_does_not_spend_credits_114": "The demo does not spend credits or create real orders.",
@@ -1021,5 +1021,8 @@
   "hotel.meta.guide": "Creation Guide · HotelLobby.ai",
   "hotel.generator.heading": "Put your duo in {app}’s frame",
   "hotel.generator.person": "Person {number}",
-  "hotel.generator.credit_count": "{count} credits"
+  "hotel.generator.credit_count": "{count} credits",
+  "hotel.generator.model_disclosure": "Current video model: none — demo mode. This workflow does not call a video generation API or produce a new AI video.",
+  "hotel.generator.content_standards": "Content standards and review process",
+  "hotel.generator.report_content": "Report content"
 }

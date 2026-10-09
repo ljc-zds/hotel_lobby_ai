@@ -8,6 +8,11 @@ const STATIC_PATHS = [
   '',
   '/pricing',
   '/blog',
+  '/about',
+  '/contact',
+  '/guide',
+  '/hotel-lobby-ai-prompts',
+  '/what-is-hotel-lobby-ai',
   '/privacy-policy',
   '/terms-of-service',
 ];

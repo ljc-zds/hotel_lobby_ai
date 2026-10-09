@@ -8,10 +8,8 @@
 // Importing the stub is harmless; calling it throws a clear error.
 function unavailable(): never {
   throw new Error(
-    'This DB driver was stubbed out of the Cloudflare Workers build because it ' +
-      'does not match vars.DATABASE_PROVIDER in wrangler.jsonc. Make sure ' +
-      'DATABASE_PROVIDER there matches the database you intend to use (d1, or ' +
-      'postgresql with a Hyperdrive binding), then rebuild.'
+    'This DB driver was excluded from the deployment build. Check that ' +
+      'DATABASE_PROVIDER matches the build configuration, then rebuild.'
   );
 }
 
@@ -25,3 +23,4 @@ export default stub;
 // Named exports drizzle-orm's drivers reference (mysql2's createPool).
 export const createPool = stub;
 export const createConnection = stub;
+export const createClient = stub;

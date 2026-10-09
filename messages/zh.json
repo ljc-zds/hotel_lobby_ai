@@ -852,5 +852,8 @@
   "hotel.nav.contact": "联系",
   "hotel.nav.videos": "我的视频",
   "hotel.nav.account": "账户",
-  "hotel.nav.credits": "演示积分"
+  "hotel.nav.credits": "演示积分",
+  "common.sign.social_unavailable": "该登录方式暂未开通，请先使用邮箱登录。",
+  "common.sign.social_failed": "无法发起第三方登录，请重试。",
+  "common.sign.social_redirecting": "正在跳转…"
 }

@@ -17,8 +17,14 @@ export function createPostgresDb(config: DbConfig) {
   let databaseUrl = config.database_url;
 
   const schemaName = (config.db_schema || 'public').trim();
+  // Neon PgBouncer rejects search_path in startup options. The PostgreSQL
+  // schema template qualifies every table with DB_SCHEMA, so pooled Neon
+  // connections do not need this session setting.
+  const isNeonPooler = new URL(
+    databaseUrl || 'postgres://localhost'
+  ).hostname.includes('-pooler.');
   const connectionSchemaOptions =
-    schemaName && schemaName !== 'public'
+    schemaName && schemaName !== 'public' && !isNeonPooler
       ? { connection: { options: `-c search_path=${schemaName}` } }
       : {};
 

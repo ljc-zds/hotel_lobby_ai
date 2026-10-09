@@ -72,6 +72,15 @@ export const Route = createRootRoute({
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { title: envConfigs.app_name },
         { name: 'description', content: envConfigs.app_description },
+        { property: 'og:site_name', content: envConfigs.app_name },
+        { property: 'og:type', content: 'website' },
+        { property: 'og:title', content: envConfigs.app_name },
+        { property: 'og:description', content: envConfigs.app_description },
+        {
+          property: 'og:image',
+          content: `${appUrl}/reference/orange-street-duo-poster-v7.webp`,
+        },
+        { name: 'twitter:card', content: 'summary_large_image' },
       ],
       links: [
         { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },

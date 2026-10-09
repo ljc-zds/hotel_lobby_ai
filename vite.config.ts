@@ -45,6 +45,11 @@ function workersDbProvider(): string {
 
 const workersDb = isCloudflareBuild ? workersDbProvider() : '';
 const keepPostgres = workersDb === 'postgresql' || workersDb === 'postgres';
+// Vercel runs on Linux. Exclude the unused SQLite native driver so a build
+// made on macOS does not load macOS-only libsql binaries at server startup.
+const isVercelPostgresBuild =
+  process.env.NITRO_PRESET === 'vercel' &&
+  ['postgresql', 'postgres'].includes(process.env.DATABASE_PROVIDER || '');
 
 export default defineConfig({
   server: {
@@ -61,7 +66,9 @@ export default defineConfig({
           mysql2: driverStub,
           ...(keepPostgres ? {} : { postgres: driverStub }),
         }
-      : {},
+      : isVercelPostgresBuild
+        ? { '@libsql/client': driverStub, mysql2: driverStub }
+        : {},
   },
   plugins: [
     // MDX must run before the react plugin so JSX in compiled MDX gets transformed.

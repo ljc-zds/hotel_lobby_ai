@@ -40,6 +40,9 @@ function SignUpPage() {
   // Set right before we navigate so the already-signed-in effect doesn't also fire.
   const navigatingRef = useRef(false);
   const [error, setError] = useState('');
+  const [socialPending, setSocialPending] = useState<
+    'google' | 'github' | null
+  >(null);
 
   const [redirectParam, setRedirectParam] = useState<string | null>(null);
   const [callbackUrl, setCallbackUrl] = useState<string | null>(null);
@@ -88,7 +91,7 @@ function SignUpPage() {
   const emailVerificationEnabled =
     configs.email_verification_enabled === 'true';
   const inviteCodeRequired = configs.invite_code_required === 'true';
-  const hasSocial = googleEnabled || githubEnabled;
+  const hasSocial = true;
   const hasAnyMethod = emailEnabled || hasSocial;
 
   const form = useForm({
@@ -163,7 +166,25 @@ function SignUpPage() {
   });
 
   async function handleSocial(provider: 'google' | 'github') {
-    await signIn.social({ provider, callbackURL: afterLoginUrl });
+    if (socialPending || !configsLoaded) return;
+    setError('');
+    const enabled = provider === 'google' ? googleEnabled : githubEnabled;
+    if (!enabled || configs[`${provider}_auth_ready`] !== 'true') {
+      setError(m['common.sign.social_unavailable']());
+      return;
+    }
+    setSocialPending(provider);
+    try {
+      const result = await signIn.social({
+        provider,
+        callbackURL: localizeHref(afterLoginUrl),
+      });
+      if (result.error) setError(m['common.sign.social_failed']());
+    } catch {
+      setError(m['common.sign.social_failed']());
+    } finally {
+      setSocialPending(null);
+    }
   }
 
   return (
@@ -197,17 +218,22 @@ function SignUpPage() {
               >
                 <FieldGroup>
                   {error && (
-                    <div className="bg-destructive/10 text-destructive rounded-lg p-3 text-sm">
+                    <div
+                      role="alert"
+                      className="bg-destructive/10 text-destructive rounded-lg p-3 text-sm"
+                    >
                       {error}
                     </div>
                   )}
 
                   {hasSocial && (
                     <Field>
-                      {googleEnabled && (
+                      {hasSocial && (
                         <Button
                           variant="outline"
                           type="button"
+                          disabled={!configsLoaded || socialPending !== null}
+                          aria-busy={socialPending === 'google'}
                           onClick={() => handleSocial('google')}
                         >
                           <svg
@@ -220,13 +246,17 @@ function SignUpPage() {
                               fill="currentColor"
                             />
                           </svg>
-                          {m['common.sign.google_sign_in']()}
+                          {socialPending === 'google'
+                            ? m['common.sign.social_redirecting']()
+                            : m['common.sign.google_sign_in']()}
                         </Button>
                       )}
-                      {githubEnabled && (
+                      {hasSocial && (
                         <Button
                           variant="outline"
                           type="button"
+                          disabled={!configsLoaded || socialPending !== null}
+                          aria-busy={socialPending === 'github'}
                           onClick={() => handleSocial('github')}
                         >
                           <svg
@@ -239,7 +269,9 @@ function SignUpPage() {
                               fill="currentColor"
                             />
                           </svg>
-                          {m['common.sign.github_sign_in']()}
+                          {socialPending === 'github'
+                            ? m['common.sign.social_redirecting']()
+                            : m['common.sign.github_sign_in']()}
                         </Button>
                       )}
                     </Field>

@@ -33,6 +33,9 @@ function SignInPage() {
   // Set right before we navigate so the already-signed-in effect doesn't also fire.
   const navigatingRef = useRef(false);
   const [error, setError] = useState('');
+  const [socialPending, setSocialPending] = useState<
+    'google' | 'github' | null
+  >(null);
 
   // callbackUrl: internal page path, goes there directly after login.
   // redirect: either an internal path (same thing) or an app protocol URL like
@@ -82,7 +85,7 @@ function SignInPage() {
   const googleEnabled = configs.google_auth_enabled === 'true';
   const githubEnabled = configs.github_auth_enabled === 'true';
   const passwordResetEnabled = configs.password_reset_enabled === 'true';
-  const hasSocial = googleEnabled || githubEnabled;
+  const hasSocial = true;
   const hasAnyMethod = emailEnabled || hasSocial;
 
   const form = useForm({
@@ -128,7 +131,25 @@ function SignInPage() {
   });
 
   async function handleSocial(provider: 'google' | 'github') {
-    await signIn.social({ provider, callbackURL: afterLoginUrl });
+    if (socialPending || !configsLoaded) return;
+    setError('');
+    const enabled = provider === 'google' ? googleEnabled : githubEnabled;
+    if (!enabled || configs[`${provider}_auth_ready`] !== 'true') {
+      setError(m['common.sign.social_unavailable']());
+      return;
+    }
+    setSocialPending(provider);
+    try {
+      const result = await signIn.social({
+        provider,
+        callbackURL: localizeHref(afterLoginUrl),
+      });
+      if (result.error) setError(m['common.sign.social_failed']());
+    } catch {
+      setError(m['common.sign.social_failed']());
+    } finally {
+      setSocialPending(null);
+    }
   }
 
   return (
@@ -162,17 +183,22 @@ function SignInPage() {
               >
                 <FieldGroup>
                   {error && (
-                    <div className="bg-destructive/10 text-destructive rounded-lg p-3 text-sm">
+                    <div
+                      role="alert"
+                      className="bg-destructive/10 text-destructive rounded-lg p-3 text-sm"
+                    >
                       {error}
                     </div>
                   )}
 
                   {hasSocial && (
                     <Field>
-                      {googleEnabled && (
+                      {hasSocial && (
                         <Button
                           variant="outline"
                           type="button"
+                          disabled={!configsLoaded || socialPending !== null}
+                          aria-busy={socialPending === 'google'}
                           onClick={() => handleSocial('google')}
                         >
                           <svg
@@ -185,13 +211,17 @@ function SignInPage() {
                               fill="currentColor"
                             />
                           </svg>
-                          {m['common.sign.google_sign_in']()}
+                          {socialPending === 'google'
+                            ? m['common.sign.social_redirecting']()
+                            : m['common.sign.google_sign_in']()}
                         </Button>
                       )}
-                      {githubEnabled && (
+                      {hasSocial && (
                         <Button
                           variant="outline"
                           type="button"
+                          disabled={!configsLoaded || socialPending !== null}
+                          aria-busy={socialPending === 'github'}
                           onClick={() => handleSocial('github')}
                         >
                           <svg
@@ -204,7 +234,9 @@ function SignInPage() {
                               fill="currentColor"
                             />
                           </svg>
-                          {m['common.sign.github_sign_in']()}
+                          {socialPending === 'github'
+                            ? m['common.sign.social_redirecting']()
+                            : m['common.sign.github_sign_in']()}
                         </Button>
                       )}
                     </Field>

@@ -10,12 +10,16 @@ import {
   boolean,
   index,
   integer,
+  pgSchema,
   pgTable,
   text,
   timestamp,
 } from 'drizzle-orm/pg-core';
 
-const table = pgTable;
+// Isolate each deployed app when a shared PostgreSQL database is used.
+const schemaName = process.env.DB_SCHEMA?.trim();
+const table =
+  schemaName && schemaName !== 'public' ? pgSchema(schemaName).table : pgTable;
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
 

@@ -852,5 +852,8 @@
   "hotel.nav.contact": "Contact",
   "hotel.nav.videos": "My videos",
   "hotel.nav.account": "Account",
-  "hotel.nav.credits": "Demo credits"
+  "hotel.nav.credits": "Demo credits",
+  "common.sign.social_unavailable": "This sign-in method is not available yet. Please use email for now.",
+  "common.sign.social_failed": "Unable to start social sign-in. Please try again.",
+  "common.sign.social_redirecting": "Connecting…"
 }

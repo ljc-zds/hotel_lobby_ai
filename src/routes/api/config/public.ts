@@ -48,6 +48,15 @@ function isEmailSendingConfigured(configs: Record<string, string>): boolean {
 async function GET({ request }: { request: Request }) {
   const configs = await getAllConfigs();
   const result = filterPublicConfigs(configs, publicKeys);
+  // Expose readiness only; provider secrets never leave the server.
+  for (const provider of ['google', 'github']) {
+    result[`${provider}_auth_ready`] =
+      configs[`${provider}_auth_enabled`] === 'true' &&
+      !!configs[`${provider}_client_id`] &&
+      !!configs[`${provider}_client_secret`]
+        ? 'true'
+        : 'false';
+  }
   const emailConfigured = isEmailSendingConfigured(configs);
   result.password_reset_enabled =
     configs.email_auth_enabled !== 'false' && emailConfigured

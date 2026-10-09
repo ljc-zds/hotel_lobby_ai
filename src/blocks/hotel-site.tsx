@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { tracks, type HotelTrack } from '@/types/hotel';
+import type { HotelTrack } from '@/types/hotel';
 import {
   ArrowRight,
   Check,
@@ -19,9 +19,11 @@ import { useSession } from '@/core/auth/client';
 import { Link } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
 import { m } from '@/paraglide/messages.js';
+import { getLocale } from '@/paraglide/runtime.js';
+import { HotelGallery } from '@/blocks/hotel-gallery';
+import { HotelGenerator } from '@/blocks/hotel-generator';
+import { getHotelTracks } from '@/blocks/hotel-tracks';
 import { BuiltWithShipAny } from '@/components/built-with-shipany';
-import { HotelGallery } from '@/components/hotel-gallery';
-import { HotelGenerator } from '@/components/hotel-generator';
 import { LocaleSelector } from '@/components/locale-selector';
 
 import '@/styles/hotel.css';
@@ -35,6 +37,7 @@ export function HotelSite({
   page?: 'home' | 'pricing' | 'orders' | 'guide' | 'content';
   children?: ReactNode;
 }) {
+  const tracks = getHotelTracks();
   const { data: session } = useSession();
   const [selected, setSelected] = useState(tracks[0]);
   const [menu, setMenu] = useState(false);
@@ -47,13 +50,21 @@ export function HotelSite({
       );
       if (Array.isArray(stored))
         setOrders(
-          stored.filter(
-            (x) =>
-              typeof x.id === 'string' &&
-              typeof x.track === 'string' &&
-              typeof x.quality === 'string' &&
-              typeof x.date === 'string'
-          )
+          stored
+            .map((x) => ({
+              ...x,
+              track:
+                getHotelTracks('zh').find((t) => t.title === x.track)?.id ||
+                getHotelTracks('en').find((t) => t.title === x.track)?.id ||
+                x.track,
+            }))
+            .filter(
+              (x) =>
+                typeof x.id === 'string' &&
+                typeof x.track === 'string' &&
+                typeof x.quality === 'string' &&
+                typeof x.date === 'string'
+            )
         );
       setCredits(Number(localStorage.getItem('hotel-demo-credits')) || 0);
     } catch {
@@ -64,7 +75,7 @@ export function HotelSite({
     const next = [
       {
         id: crypto.randomUUID(),
-        track: track.title,
+        track: track.id,
         quality,
         date: new Date().toISOString(),
       },
@@ -74,7 +85,7 @@ export function HotelSite({
     try {
       localStorage.setItem('hotel-demo-orders', JSON.stringify(next));
     } catch {
-      toast.info('浏览器未允许保存历史，本次演示仍已完成。');
+      toast.info(m['hotel.copy.your_browser_could_not_save_the_001']());
     }
   }
   function addCredits(amount: number) {
@@ -85,16 +96,22 @@ export function HotelSite({
     } catch {
       /* Demo still works without storage. */
     }
-    toast.success(`已添加 ${amount} 演示积分，无实际扣款。`);
+    toast.success(
+      m['hotel.copy.added_demo_credits_no_payment_was_002']({ amount })
+    );
   }
   return (
     <div className="hotel-site">
       <div className="announcement-bar">
-        HOTEL LOBBY AI / 14 个音乐模板 / 两张照片的共同舞台
+        {m['hotel.copy.hotel_lobby_ai_14_music_templates_003']()}
       </div>
       <header className="site-header">
         <div className="header-inner container">
-          <Link href="/" className="brand" aria-label="首页">
+          <Link
+            href="/"
+            className="brand"
+            aria-label={m['hotel.copy.home_004']()}
+          >
             <span className="brand-mark-wrap">
               <img
                 className="brand-mark"
@@ -109,7 +126,7 @@ export function HotelSite({
           </Link>
           <nav
             className={`hotel-nav ${menu ? 'is-open' : ''}`}
-            aria-label="主导航"
+            aria-label={m['hotel.copy.main_navigation_005']()}
             onClick={() => setMenu(false)}
           >
             <Link href="/#video-generator">{m['hotel.nav.generator']()}</Link>
@@ -151,7 +168,11 @@ export function HotelSite({
             </Link>
             <button
               className="hotel-menu"
-              aria-label={menu ? '关闭导航' : '打开导航'}
+              aria-label={
+                menu
+                  ? m['hotel.copy.close_navigation_006']()
+                  : m['hotel.copy.open_navigation_007']()
+              }
               aria-expanded={menu}
               onClick={() => setMenu(!menu)}
             >
@@ -168,25 +189,28 @@ export function HotelSite({
               <div className="hero-grid-lines" />
               <div className="hero-grid container">
                 <div className="hero-copy">
-                  <div className="eyebrow">HOTEL LOBBY AI 说唱视频生成器</div>
+                  <div className="eyebrow">
+                    {m['hotel.copy.hotel_lobby_ai_rap_video_generator_008']()}
+                  </div>
                   <h1 className="hero-title-exact">
-                    你的双人组合。
+                    {m['hotel.copy.your_duo_009']()}
                     <br />
-                    <span>你的段落。</span>
+                    <span>{m['hotel.copy.your_verse_010']()}</span>
                     <br />
-                    一次发布。
+                    {m['hotel.copy.one_drop_011']()}
                   </h1>
                   <p>
-                    预览带声音的 15 秒横屏 Hotel Lobby AI 模板，上传两张照片生成
-                    15 秒 16:9 视频。成片恢复所选模板的原音乐；AI
-                    会参考模板动作，而非逐帧复制。
+                    {m[
+                      'hotel.copy.preview_15second_landscape_music_templates_and_012'
+                    ]()}
                   </p>
                   <div className="hero-actions">
                     <a href="#video-generator" className="hero-primary">
-                      制作视频 <ArrowRight size={18} />
+                      {m['hotel.copy.make_a_video_013']()}
+                      <ArrowRight size={18} />
                     </a>
                     <a href="#templates" className="hero-secondary">
-                      浏览模板
+                      {m['hotel.copy.browse_templates_014']()}
                     </a>
                   </div>
                   <div className="hero-facts">
@@ -208,10 +232,17 @@ export function HotelSite({
                     <div className="eyebrow hotel-room-label">
                       ORANGE STUDIO · CENTER MIC
                     </div>
-                    <a href="#templates" aria-label="浏览橙色街头双人秀模板">
+                    <a
+                      href="#templates"
+                      aria-label={m[
+                        'hotel.copy.browse_the_orange_street_duo_template_015'
+                      ]()}
+                    >
                       <img
                         src={tracks[0].image}
-                        alt="橙色影棚里，两位表演者围绕中央吊麦演唱"
+                        alt={m[
+                          'hotel.copy.two_performers_singing_around_a_suspended_016'
+                        ]()}
                         fetchPriority="high"
                       />
                     </a>
@@ -225,7 +256,7 @@ export function HotelSite({
                   <a
                     className="hotel-sticker"
                     href="#templates"
-                    aria-label="浏览音乐模板"
+                    aria-label={m['hotel.copy.browse_music_templates_017']()}
                   >
                     HOTEL
                     <br />
@@ -241,25 +272,28 @@ export function HotelSite({
             <section className="how-section container">
               <div className="eyebrow">HOTEL LOBBY AI WORKFLOW</div>
               <h2>
-                三步，制作一支
+                {m['hotel.copy.three_steps_to_your_018']()}
                 <br />
-                HOTEL LOBBY AI 视频。
+                {m['hotel.copy.hotel_lobby_ai_video_019']()}
               </h2>
               <div className="steps-grid">
                 {[
                   {
-                    title: '上传两张清晰照片',
-                    text: '每侧使用一位主体，确保面部清晰、光线均匀。',
+                    title: m['hotel.copy.upload_two_clear_photos_020'](),
+                    text: m['hotel.copy.use_one_subject_per_photo_with_021'](),
                     icon: ImagePlus,
                   },
                   {
-                    title: '选择 Hotel Lobby AI 模板',
-                    text: '从十四种橙色、酒店、文化灵感和动物场景中选择。',
+                    title:
+                      m['hotel.copy.choose_a_hotel_lobby_ai_template_022'](),
+                    text: m[
+                      'hotel.copy.explore_fourteen_orange_studio_hotel_cultural_023'
+                    ](),
                     icon: Mic,
                   },
                   {
-                    title: '选择画质并生成',
-                    text: '选择 480p、720p 或 1080p，体验完整的创作流程。',
+                    title: m['hotel.copy.choose_a_resolution_and_create_024'](),
+                    text: m['hotel.copy.try_the_workflow_in_480p_720p_025'](),
                     icon: Play,
                   },
                 ].map((s, i) => (
@@ -277,20 +311,23 @@ export function HotelSite({
                 <div>
                   <div className="eyebrow">HOTEL LOBBY AI FORMAT</div>
                   <h2>
-                    一种双主体
+                    {m['hotel.copy.a_twosubject_026']()}
                     <br />
-                    <span>说唱视频形式。</span>
+                    <span>{m['hotel.copy.rap_video_format_027']()}</span>
                   </h2>
                 </div>
                 <div className="trend-copy">
                   <p>
-                    两个主体、一个悬挂麦克风、固定横屏镜头、交替表演动作和同步节拍。
+                    {m[
+                      'hotel.copy.two_subjects_one_suspended_microphone_a_028'
+                    ]()}
                   </p>
                   <p>
-                    把朋友、情侣、宠物或创作团队放进同一个画面。从两张照片开始，创造属于你的舞台。
+                    {m['hotel.copy.put_friends_couples_pets_or_your_029']()}
                   </p>
                   <Link href="/guide" className="hero-secondary">
-                    阅读完整指南 <ArrowRight size={16} />
+                    {m['hotel.copy.read_the_full_guide_030']()}
+                    <ArrowRight size={16} />
                   </Link>
                 </div>
               </div>
@@ -299,17 +336,19 @@ export function HotelSite({
               <div>
                 <div className="eyebrow">HOTEL LOBBY AI PHOTO GUIDE</div>
                 <h2>
-                  更好的照片，
+                  {m['hotel.copy.better_photos_031']()}
                   <br />
-                  更好的效果。
+                  {m['hotel.copy.better_results_032']()}
                 </h2>
               </div>
               <div className="hotel-photo-tips">
                 {[
-                  '每张照片仅一位主体',
-                  '正面或略微侧身',
-                  '确保眼睛和下颌线可见',
-                  '使用原始照片，而非截图',
+                  m['hotel.copy.one_subject_per_photo_033'](),
+                  m['hotel.copy.face_forward_or_slightly_to_the_034'](),
+                  m['hotel.copy.keep_eyes_and_jawline_visible_035'](),
+                  m[
+                    'hotel.copy.use_original_photos_rather_than_screenshots_036'
+                  ](),
                 ].map((x, i) => (
                   <div key={x}>
                     <span>0{i + 1}</span>
@@ -321,24 +360,24 @@ export function HotelSite({
             </section>
             <section className="faq-section container">
               <div className="eyebrow">HOTEL LOBBY AI FAQ</div>
-              <h2>生成前的常见问题</h2>
+              <h2>{m['hotel.copy.questions_before_you_create_037']()}</h2>
               <div className="hotel-faq">
                 {[
                   {
-                    q: '应该上传什么照片？',
-                    a: '每张照片只包含一位清晰的主体，使用光线均匀、面部可见的 JPG、PNG 或 WebP 原图，文件最大 8 MB。',
+                    q: m['hotel.copy.what_photos_should_i_use_038'](),
+                    a: m['hotel.copy.use_an_original_jpg_png_or_039'](),
                   },
                   {
-                    q: '一支视频需要多少积分？',
-                    a: '参考站的 480p、720p 和 1080p 分别需要 20、45 和 80 积分。本模板仅演示交互，不会实际扣款。',
+                    q: m['hotel.copy.how_many_credits_does_a_video_040'](),
+                    a: m['hotel.copy.the_reference_workflow_uses_20_45_041'](),
                   },
                   {
-                    q: '在哪里查看作品历史？',
-                    a: '打开“我的作品”即可查看当前浏览器保存的演示记录。演示不会生成新的 AI 视频。',
+                    q: m['hotel.copy.where_can_i_find_my_history_042'](),
+                    a: m['hotel.copy.open_my_videos_to_see_demo_043'](),
                   },
                   {
-                    q: '照片会上传到哪里？',
-                    a: '在这个模板里，照片仅在你的浏览器中预览，不会发送到服务器。请只使用你有权使用的素材。',
+                    q: m['hotel.copy.where_are_my_photos_uploaded_044'](),
+                    a: m['hotel.copy.photos_are_previewed_only_in_your_045'](),
                   },
                 ].map((f, i) => (
                   <details key={f.q}>
@@ -357,13 +396,14 @@ export function HotelSite({
                 <div>
                   <div className="eyebrow">HOTEL LOBBY AI GENERATOR</div>
                   <h2>
-                    让你的组合
+                    {m['hotel.copy.let_your_duo_046']()}
                     <br />
-                    成为主角。
+                    {m['hotel.copy.take_the_spotlight_047']()}
                   </h2>
                 </div>
                 <a className="hero-secondary" href="#video-generator">
-                  开始创作 <ArrowRight size={18} />
+                  {m['hotel.copy.start_creating_048']()}
+                  <ArrowRight size={18} />
                 </a>
               </div>
             </section>
@@ -374,13 +414,14 @@ export function HotelSite({
             <section className="hotel-page-intro container">
               <div className="eyebrow">CREDIT PACKS</div>
               <h1>
-                你的下一次发布。
+                {m['hotel.copy.your_next_drop_049']()}
                 <br />
-                <span>从这里开始。</span>
+                <span>{m['hotel.copy.starts_here_050']()}</span>
               </h1>
-              <p>一次购买，按次创作。选择适合你的点数包。</p>
+              <p>{m['hotel.copy.choose_a_credit_pack_for_your_051']()}</p>
               <div className="hotel-demo-notice">
-                模板演示 · 不会收取费用 · 当前演示积分 {credits}
+                {m['hotel.copy.template_demo_no_payment_demo_credits_052']()}
+                {credits}
               </div>
             </section>
             <section id="credit-packs" className="pack-grid container">
@@ -402,29 +443,31 @@ export function HotelSite({
                   <ul>
                     <li>
                       <Check />
-                      480p、720p 或 1080p
+                      {m['hotel.copy.480p_720p_or_1080p_053']()}
                     </li>
                     <li>
                       <Check />
-                      14 种场景模板
+                      {m['hotel.copy.14_scene_templates_054']()}
                     </li>
                     <li>
                       <Check />
-                      15 秒横屏视频
+                      {m['hotel.copy.15second_landscape_video_055']()}
                     </li>
                   </ul>
                   <button
                     className="primary-action"
                     onClick={() => addCredits(pack.credits)}
                   >
-                    演示购买 <ArrowRight size={16} />
+                    {m['hotel.copy.try_demo_purchase_056']()}
+                    <ArrowRight size={16} />
                   </button>
                 </article>
               ))}
             </section>
             <section className="hotel-pricing-foot container">
               <Link href="/orders" className="hero-secondary">
-                查看演示积分 <ArrowRight size={16} />
+                {m['hotel.copy.view_demo_credits_057']()}
+                <ArrowRight size={16} />
               </Link>
             </section>
           </>
@@ -432,27 +475,30 @@ export function HotelSite({
         {page === 'orders' && (
           <section className="hotel-page-intro container">
             <div className="eyebrow">ORDERS</div>
-            <h1>你的创作空间。</h1>
-            <p>查看积分与作品，接着创作下一支视频。</p>
+            <h1>{m['hotel.copy.your_creative_space_058']()}</h1>
+            <p>{m['hotel.copy.check_your_credits_and_creations_then_059']()}</p>
             <div className="hotel-orders-summary">
               <article>
-                <span>演示积分</span>
+                <span>{m['hotel.copy.demo_credits_060']()}</span>
                 <strong>{credits}</strong>
                 <Link href="/pricing">
-                  添加积分 <ArrowRight size={16} />
+                  {m['hotel.copy.add_credits_061']()}
+                  <ArrowRight size={16} />
                 </Link>
               </article>
               <article>
-                <span>演示作品</span>
+                <span>{m['hotel.copy.demo_creations_062']()}</span>
                 <strong>{orders.length}</strong>
                 <Link href="/#video-generator">
-                  开始创作 <ArrowRight size={16} />
+                  {m['hotel.copy.start_creating_048']()}
+                  <ArrowRight size={16} />
                 </Link>
               </article>
             </div>
             <div className="hotel-demo-notice">
-              本页展示当前浏览器的演示数据。
-              <Link href="/sign-in">登录账户</Link> 可使用项目原有的账户功能。
+              {m['hotel.copy.this_page_shows_demo_data_saved_063']()}
+              <Link href="/sign-in">{m['hotel.copy.sign_in_064']()}</Link>
+              {m['hotel.copy.to_use_the_account_features_065']()}
             </div>
             {orders.length ? (
               <div className="hotel-order-list">
@@ -460,20 +506,30 @@ export function HotelSite({
                   <article key={o.id}>
                     <img
                       src={
-                        tracks.find((t) => t.title === o.track)?.image ||
+                        tracks.find((t) => t.id === o.track)?.image ||
                         tracks[0].image
                       }
                       alt=""
                     />
                     <div>
-                      <h3>{o.track}</h3>
+                      <h3>
+                        {tracks.find((t) => t.id === o.track)?.title || o.track}
+                      </h3>
                       <p>
-                        {o.quality} · {new Date(o.date).toLocaleString('zh-CN')}
+                        {o.quality} ·{' '}
+                        {new Date(o.date).toLocaleString(
+                          getLocale() === 'zh' ? 'zh-CN' : 'en-US'
+                        )}
                       </p>
-                      <span>演示已完成 · 未生成 AI 视频</span>
+                      <span>
+                        {m[
+                          'hotel.copy.demo_complete_no_ai_video_generated_066'
+                        ]()}
+                      </span>
                     </div>
                     <Link href="/#video-generator">
-                      再次创作 <ArrowRight size={16} />
+                      {m['hotel.copy.create_again_067']()}
+                      <ArrowRight size={16} />
                     </Link>
                   </article>
                 ))}
@@ -481,10 +537,11 @@ export function HotelSite({
             ) : (
               <div className="hotel-empty">
                 <Mic size={36} />
-                <h2>舞台已经就绪。</h2>
-                <p>选择一个模板，上传两张照片，体验你的第一次创作。</p>
+                <h2>{m['hotel.copy.the_stage_is_ready_068']()}</h2>
+                <p>{m['hotel.copy.choose_a_template_and_add_two_069']()}</p>
                 <Link href="/#video-generator" className="hero-primary">
-                  开始创作 <ArrowRight size={18} />
+                  {m['hotel.copy.start_creating_048']()}
+                  <ArrowRight size={18} />
                 </Link>
               </div>
             )}
@@ -494,30 +551,26 @@ export function HotelSite({
           <section className="hotel-page-intro hotel-guide container">
             <div className="eyebrow">THE HOTEL LOBBY AI GUIDE</div>
             <h1>
-              两张照片。
+              {m['hotel.copy.two_photos_070']()}
               <br />
-              <span>一个共同舞台。</span>
+              <span>{m['hotel.copy.one_shared_stage_071']()}</span>
             </h1>
-            <p>
-              Hotel Lobby AI
-              是一种双主体音乐视频形式：一个麦克风、一个横屏镜头，两位主角轮流表演。
-            </p>
-            <img src={tracks[0].image} alt="橙色双人音乐影棚" />
-            <h2>让照片适合舞台</h2>
-            <p>
-              每张照片只保留一位清晰且获授权的主体。头像用于参考脸部；全身照还能提供发型和服装信息。
-            </p>
-            <h2>一个可以改写的提示词</h2>
+            <p>{m['hotel.copy.hotel_lobby_ai_is_a_twosubject_072']()}</p>
+            <img
+              src={tracks[0].image}
+              alt={m['hotel.copy.orange_studio_with_two_performers_073']()}
+            />
+            <h2>{m['hotel.copy.get_your_photos_stageready_074']()}</h2>
+            <p>{m['hotel.copy.use_one_clear_subject_per_photo_075']()}</p>
+            <h2>{m['hotel.copy.a_prompt_you_can_adapt_076']()}</h2>
             <blockquote>
-              两位主体在纯橙色影棚中交替演唱，一个悬挂麦克风位于画面中央。固定
-              16:9 横屏镜头，自然的手势与节拍，保留主体的面部特征和服装。
+              {m['hotel.copy.two_subjects_take_turns_singing_in_077']()}
             </blockquote>
-            <h2>检查你的素材权利</h2>
-            <p>
-              只使用已获得授权的照片。发布前检查完整成片，避免冒充、欺骗或骚扰他人。
-            </p>
+            <h2>{m['hotel.copy.check_your_image_permissions_078']()}</h2>
+            <p>{m['hotel.copy.use_only_authorized_photos_review_the_079']()}</p>
             <Link href="/#video-generator" className="hero-primary">
-              开始创作 <ArrowRight size={18} />
+              {m['hotel.copy.start_creating_048']()}
+              <ArrowRight size={18} />
             </Link>
           </section>
         )}
@@ -526,15 +579,15 @@ export function HotelSite({
         <div className="footer-grid container">
           <div>
             <div className="footer-brand">{envConfigs.app_name}</div>
-            <p>两张照片，一次原创发布。</p>
+            <p>{m['hotel.copy.two_photos_one_original_drop_080']()}</p>
           </div>
           <div className="footer-links">
-            <Link href="/pricing">价格</Link>
+            <Link href="/pricing">{m['hotel.copy.pricing_081']()}</Link>
             <Link href="/what-is-hotel-lobby-ai">{m['hotel.nav.what']()}</Link>
             <Link href="/hotel-lobby-ai-prompts">
               {m['hotel.nav.prompts']()}
             </Link>
-            <Link href="/orders">我的作品</Link>
+            <Link href="/orders">{m['hotel.copy.my_videos_082']()}</Link>
             <Link href="/blog">{m['hotel.nav.blog']()}</Link>
             <Link href="/about">{m['hotel.nav.about']()}</Link>
             <Link href="/contact">{m['hotel.nav.contact']()}</Link>
@@ -546,11 +599,18 @@ export function HotelSite({
               <Mail size={16} />
               {m['hotel.nav.contact']()}
             </Link>
-            <p>仅使用获授权素材 · AI 创作模板</p>
+            <p>
+              {m[
+                'hotel.copy.authorized_images_only_ai_creation_template_083'
+              ]()}
+            </p>
           </div>
         </div>
         <div className="footer-bottom hotel-footer-bottom container">
-          <span>© 2026 {envConfigs.app_name} · 模板演示。</span>
+          <span>
+            © 2026 {envConfigs.app_name}
+            {m['hotel.copy.template_demo_084']()}
+          </span>
           <BuiltWithShipAny />
         </div>
       </footer>

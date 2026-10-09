@@ -1,9 +1,11 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { tracks, type HotelTrack } from '@/types/hotel';
+import type { HotelTrack } from '@/types/hotel';
 import { ArrowRight, Check, Play, Volume2, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 
 import { envConfigs } from '@/config';
+import { m } from '@/paraglide/messages.js';
+import { getHotelTracks } from '@/blocks/hotel-tracks';
 
 interface HotelGalleryProps {
   selected: HotelTrack;
@@ -12,19 +14,18 @@ interface HotelGalleryProps {
   items?: HotelTrack[];
 }
 
-const categories = [
-  { id: 'all', label: '全部模板' },
-  { id: 'people', label: '人物' },
-  { id: 'culture', label: '文化' },
-  { id: 'animals', label: '动物' },
-];
-
 export function HotelGallery({
   selected,
   onSelect,
   title,
-  items = tracks,
+  items = getHotelTracks(),
 }: HotelGalleryProps) {
+  const categories = [
+    { id: 'all', label: m['hotel.copy.all_templates_118']() },
+    { id: 'people', label: m['hotel.copy.person_101']() },
+    { id: 'culture', label: m['hotel.copy.culture_119']() },
+    { id: 'animals', label: m['hotel.copy.animals_120']() },
+  ];
   const [category, setCategory] = useState('all');
   const [preview, setPreview] = useState<HotelTrack | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -89,9 +90,18 @@ export function HotelGallery({
       <div className="section-heading-row">
         <div>
           <span className="eyebrow">02 · PICK A TRACK</span>
-          <h2 id={headingId}>{title ?? `选择 ${envConfigs.app_name} 模板`}</h2>
+          <h2 id={headingId}>
+            {title ??
+              m['hotel.copy.choose_a_template_121']({
+                app: envConfigs.app_name,
+              })}
+          </h2>
         </div>
-        <div className="filter-row" role="group" aria-label="模板分类">
+        <div
+          className="filter-row"
+          role="group"
+          aria-label={m['hotel.copy.template_categories_122']()}
+        >
           {categories.map((item) => (
             <button
               key={item.id}
@@ -107,7 +117,7 @@ export function HotelGallery({
       </div>
       <p className="template-audio-note">
         <Volume2 size={16} aria-hidden="true" />
-        点击预览，挑选你的双人表演模板
+        {m['hotel.copy.preview_and_choose_your_duos_performance_123']()}
       </p>
       <div className="template-grid">
         {items
@@ -121,7 +131,9 @@ export function HotelGallery({
                 <button
                   type="button"
                   className="template-preview-target"
-                  aria-label={`预览${track.title}`}
+                  aria-label={m['hotel.copy.preview_124']({
+                    title: track.title,
+                  })}
                   onClick={(event) => {
                     triggerRef.current = event.currentTarget;
                     setPreview(track);
@@ -139,7 +151,7 @@ export function HotelGallery({
                   </span>
                   <span className="preview-chip">
                     <Play size={10} aria-hidden="true" />
-                    预览
+                    {m['hotel.copy.preview_125']()}
                   </span>
                   <span className="landscape-play">
                     <Play size={20} fill="currentColor" aria-hidden="true" />
@@ -148,16 +160,18 @@ export function HotelGallery({
                 {selected.id === track.id && (
                   <span className="selected-chip">
                     <Check size={11} aria-hidden="true" />
-                    已选择
+                    {m['hotel.copy.selected_126']()}
                   </span>
                 )}
                 <button
                   type="button"
                   className="template-create-cta"
                   onClick={() => choose(track)}
-                  aria-label={`用${track.title}创作同款`}
+                  aria-label={m['hotel.copy.create_with_127']({
+                    title: track.title,
+                  })}
                 >
-                  创作同款
+                  {m['hotel.copy.create_this_style_128']()}
                   <ArrowRight size={12} aria-hidden="true" />
                 </button>
               </div>
@@ -170,7 +184,7 @@ export function HotelGallery({
                 <strong>{track.title}</strong>
                 <span>{track.description}</span>
                 <small>
-                  选择此模板
+                  {m['hotel.copy.choose_this_template_129']()}
                   <ArrowRight size={12} aria-hidden="true" />
                 </small>
               </button>
@@ -195,7 +209,7 @@ export function HotelGallery({
               <button
                 className="modal-close"
                 type="button"
-                aria-label="关闭预览"
+                aria-label={m['hotel.copy.close_preview_130']()}
                 onClick={() => setPreview(null)}
               >
                 <X size={20} />
@@ -228,7 +242,9 @@ export function HotelGallery({
                   <h3 id={previewHeadingId}>{preview.title}</h3>
                   <p>{preview.description}</p>
                   {preview.id !== 'orange-street-duo' && (
-                    <p>此模板暂未提供视频预览，当前展示模板封面。</p>
+                    <p>
+                      {m['hotel.copy.video_preview_is_not_available_for_131']()}
+                    </p>
                   )}
                 </div>
                 <button
@@ -236,7 +252,7 @@ export function HotelGallery({
                   type="button"
                   onClick={() => choose(preview)}
                 >
-                  创作同款
+                  {m['hotel.copy.create_this_style_128']()}
                   <ArrowRight size={18} aria-hidden="true" />
                 </button>
               </div>

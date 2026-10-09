@@ -11,16 +11,12 @@ import {
 } from 'lucide-react';
 
 import { envConfigs } from '@/config';
+import { m } from '@/paraglide/messages.js';
 
 interface Photo {
   url: string;
   name: string;
 }
-const resolutions = [
-  { quality: '480p', credits: 20, detail: '快速预览 · 标准清晰度' },
-  { quality: '720p', credits: 45, detail: '推荐选择 · 高清画面' },
-  { quality: '1080p', credits: 80, detail: '细节优先 · 全高清画面' },
-];
 
 export function HotelGenerator({
   selected,
@@ -29,6 +25,23 @@ export function HotelGenerator({
   selected: HotelTrack;
   onGenerated: (track: HotelTrack, quality: string) => void;
 }) {
+  const resolutions = [
+    {
+      quality: '480p',
+      credits: 20,
+      detail: m['hotel.copy.quick_preview_standard_definition_085'](),
+    },
+    {
+      quality: '720p',
+      credits: 45,
+      detail: m['hotel.copy.recommended_high_definition_086'](),
+    },
+    {
+      quality: '1080p',
+      credits: 80,
+      detail: m['hotel.copy.more_detail_full_hd_087'](),
+    },
+  ];
   const id = useId();
   const [photos, setPhotos] = useState<[Photo | null, Photo | null]>([
     null,
@@ -65,9 +78,9 @@ export function HotelGenerator({
   function choosePhoto(file: File | undefined, slot: 0 | 1) {
     if (!file) return;
     const error = !['image/jpeg', 'image/png', 'image/webp'].includes(file.type)
-      ? '请选择 JPG、PNG 或 WebP 图片。'
+      ? m['hotel.copy.choose_a_jpg_png_or_webp_088']()
       : file.size > 8 * 1024 * 1024
-        ? '图片不能超过 8 MB，请选择较小的文件。'
+        ? m['hotel.copy.images_must_be_under_8_mb_089']()
         : '';
     setErrors((previous) => {
       const next: [string, string] = [...previous];
@@ -92,7 +105,10 @@ export function HotelGenerator({
     timer.current = setTimeout(() => {
       setBusy(false);
       setResult(
-        `演示完成：${chosenTrack.title} · ${chosenQuality}。已添加到演示作品；没有生成 AI 视频，也没有上传照片。`
+        m['hotel.copy.demo_complete_added_to_demo_creations_090']({
+          title: chosenTrack.title,
+          quality: chosenQuality,
+        })
       );
       onGenerated(chosenTrack, chosenQuality);
       timer.current = null;
@@ -110,17 +126,14 @@ export function HotelGenerator({
           <div>
             <span className="eyebrow">YOUR DUO. YOUR STAGE.</span>
             <h2 id={`${id}-heading`}>
-              将你的组合置于 {envConfigs.app_name} 画面中
+              {m['hotel.generator.heading']({ app: envConfigs.app_name })}
             </h2>
-            <p>
-              选好场景，添加两张照片，预览你的双人组合。当前为交互演示，不会生成
-              AI 视频。
-            </p>
+            <p>{m['hotel.copy.choose_a_scene_add_two_photos_093']()}</p>
           </div>
           <div className="selected-template-mini">
             <img src={selected.image} alt="" />
             <div>
-              <span>已选择模板</span>
+              <span>{m['hotel.copy.selected_template_094']()}</span>
               <strong>{selected.title}</strong>
             </div>
           </div>
@@ -130,8 +143,10 @@ export function HotelGenerator({
             <div className="studio-step-label">
               <span>01</span>
               <div>
-                <strong>上传你的双人组合</strong>
-                <small>清晰正面照片，效果更佳</small>
+                <strong>{m['hotel.copy.upload_your_duo_095']()}</strong>
+                <small>
+                  {m['hotel.copy.clear_frontfacing_photos_work_best_096']()}
+                </small>
               </div>
             </div>
             <div className="upload-grid">
@@ -141,7 +156,7 @@ export function HotelGenerator({
                     <button
                       type="button"
                       className="swap-button"
-                      aria-label="交换两张照片"
+                      aria-label={m['hotel.copy.swap_the_two_photos_097']()}
                       disabled={busy || (!photos[0] && !photos[1])}
                       onClick={() => {
                         updatePhotos([photos[1], photos[0]]);
@@ -159,7 +174,9 @@ export function HotelGenerator({
                       type="file"
                       accept="image/jpeg,image/png,image/webp"
                       disabled={busy}
-                      aria-label={`添加人物 ${slot + 1} 的照片`}
+                      aria-label={m['hotel.copy.add_a_photo_for_person_098']({
+                        number: slot + 1,
+                      })}
                       aria-describedby={`${id}-error-${slot}`}
                       onChange={(event) => {
                         choosePhoto(event.currentTarget.files?.[0], slot);
@@ -171,7 +188,9 @@ export function HotelGenerator({
                       htmlFor={`${id}-photo-${slot}`}
                       tabIndex={busy ? -1 : 0}
                       role="button"
-                      aria-label={`添加或更换人物 ${slot + 1} 的照片`}
+                      aria-label={m[
+                        'hotel.copy.add_or_replace_the_photo_for_099'
+                      ]({ number: slot + 1 })}
                       onKeyDown={(event) => {
                         if (event.key === 'Enter' || event.key === ' ') {
                           event.preventDefault();
@@ -184,17 +203,25 @@ export function HotelGenerator({
                       {photos[slot] && (
                         <img
                           src={photos[slot].url}
-                          alt={`人物 ${slot + 1} 的本地照片预览`}
+                          alt={m[
+                            'hotel.copy.local_photo_preview_for_person_100'
+                          ]({ number: slot + 1 })}
                         />
                       )}
                       <div className="upload-copy">
-                        <span className="field-title">人物 {slot + 1}</span>
+                        <span className="field-title">
+                          {m['hotel.copy.person_101']()}
+                          {slot + 1}
+                        </span>
                         <ImagePlus size={30} aria-hidden="true" />
-                        <strong>{photos[slot]?.name || '点击添加照片'}</strong>
+                        <strong>
+                          {photos[slot]?.name ||
+                            m['hotel.copy.click_to_add_a_photo_102']()}
+                        </strong>
                         <span>
                           {photos[slot]
-                            ? '点击更换照片'
-                            : 'JPG / PNG / WEBP · 最大 8 MB'}
+                            ? m['hotel.copy.click_to_replace_the_photo_103']()
+                            : m['hotel.copy.jpg_png_webp_max_8_mb_104']()}
                         </span>
                       </div>
                     </label>
@@ -203,7 +230,9 @@ export function HotelGenerator({
                         className="remove-upload"
                         type="button"
                         disabled={busy}
-                        aria-label={`移除人物 ${slot + 1} 的照片`}
+                        aria-label={m[
+                          'hotel.copy.remove_the_photo_for_person_105'
+                        ]({ number: slot + 1 })}
                         onClick={() => {
                           const next: [Photo | null, Photo | null] = [
                             ...photos,
@@ -228,21 +257,25 @@ export function HotelGenerator({
             </div>
             <p className="privacy-note">
               <ShieldCheck size={16} />
-              本地预览，照片不会上传。仅保存在当前页面，关闭页面即释放。
+              {m['hotel.copy.local_preview_only_photos_are_not_106']()}
             </p>
           </div>
           <div className="studio-settings-pane">
             <div className="studio-step-label">
               <span>02</span>
               <div>
-                <strong>选择视频分辨率</strong>
-                <small>查看不同清晰度对应的积分</small>
+                <strong>{m['hotel.copy.choose_video_resolution_107']()}</strong>
+                <small>
+                  {m[
+                    'hotel.copy.compare_the_credits_for_each_resolution_108'
+                  ]()}
+                </small>
               </div>
             </div>
             <div
               className="resolution-grid"
               role="group"
-              aria-label="视频分辨率"
+              aria-label={m['hotel.copy.video_resolution_109']()}
             >
               {resolutions.map((item) => (
                 <button
@@ -257,7 +290,9 @@ export function HotelGenerator({
                   }}
                 >
                   <strong>{item.quality}</strong>
-                  <span>{item.credits} 积分</span>
+                  <span>
+                    {m['hotel.generator.credit_count']({ count: item.credits })}
+                  </span>
                   <small>{item.detail}</small>
                 </button>
               ))}
@@ -272,18 +307,26 @@ export function HotelGenerator({
               <span className="check-box" aria-hidden="true">
                 {consent && <Check size={12} />}
               </span>
-              <span>我确认拥有照片使用权，并已获得照片中人物的同意。</span>
+              <span>
+                {m['hotel.copy.i_have_permission_to_use_these_111']()}
+              </span>
             </label>
             <div className="action-summary">
               <div>
-                <span>已选分辨率</span>
+                <span>{m['hotel.copy.selected_resolution_112']()}</span>
                 <strong>{quality}</strong>
               </div>
               <div>
-                <span>模板积分</span>
-                <strong>{resolution.credits} 积分</strong>
+                <span>{m['hotel.copy.template_credits_113']()}</span>
+                <strong>
+                  {m['hotel.generator.credit_count']({
+                    count: resolution.credits,
+                  })}
+                </strong>
               </div>
-              <small>演示不扣积分，不创建真实订单。</small>
+              <small>
+                {m['hotel.copy.the_demo_does_not_spend_credits_114']()}
+              </small>
             </div>
             <button
               className="primary-action"
@@ -296,10 +339,12 @@ export function HotelGenerator({
               ) : (
                 <Sparkles size={18} />
               )}
-              {busy ? '正在准备演示…' : '演示生成'}
+              {busy
+                ? m['hotel.copy.preparing_demo_115']()
+                : m['hotel.copy.run_demo_116']()}
             </button>
             <p className="studio-foot">
-              请先添加两张照片并勾选授权确认。此模板仅演示界面流程。
+              {m['hotel.copy.add_two_photos_and_confirm_permission_117']()}
             </p>
             <p role="status" aria-live="polite" className="privacy-note">
               {result}

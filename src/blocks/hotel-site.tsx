@@ -598,6 +598,7 @@ export function HotelSite({
               <Mail size={16} />
               {m['hotel.nav.contact']()}
             </Link>
+            <a href="mailto:2670855280@qq.com">2670855280@qq.com</a>
             <p>
               {m[
                 'hotel.copy.authorized_images_only_ai_creation_template_083'

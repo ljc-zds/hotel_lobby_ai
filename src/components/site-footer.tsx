@@ -119,6 +119,12 @@ export function SiteFooter({
             {copyright ||
               `© ${year} ${envConfigs.app_name}. All rights reserved.`}
           </span>
+          <a
+            href="mailto:2670855280@qq.com"
+            className="text-sm text-neutral-300 underline underline-offset-4 transition-colors hover:text-neutral-100"
+          >
+            2670855280@qq.com
+          </a>
         </div>
       </div>
     </footer>

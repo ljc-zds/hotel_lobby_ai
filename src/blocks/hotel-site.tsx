@@ -112,11 +112,7 @@ export function HotelSite({
             aria-label={m['hotel.copy.home_004']()}
           >
             <span className="brand-mark-wrap">
-              <img
-                className="brand-mark"
-                src="/reference/hotellobby-mark-clean.webp"
-                alt=""
-              />
+              <img className="brand-mark" src="/logo.svg?v=2" alt="" />
             </span>
             <span>
               {envConfigs.app_name.replace(/\.ai$/, '')}

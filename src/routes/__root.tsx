@@ -87,8 +87,8 @@ export const Route = createRootRoute({
         { name: 'twitter:card', content: 'summary_large_image' },
       ],
       links: [
-        { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },
-        { rel: 'apple-touch-icon', href: '/favicon.svg' },
+        { rel: 'icon', href: '/favicon.svg?v=2', type: 'image/svg+xml' },
+        { rel: 'apple-touch-icon', href: '/favicon.svg?v=2' },
         {
           rel: 'stylesheet',
           href: 'https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+SC:wght@400;600;700;900&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap',

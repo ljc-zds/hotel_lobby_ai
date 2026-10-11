@@ -1,1 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#c8ff32"/><text x="256" y="355" text-anchor="middle" font-family="sans-serif" font-size="330" font-weight="900" fill="#08090b">H</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="17" fill="#315bff"/>
+  <circle cx="21" cy="21" r="6" fill="#fff"/>
+  <circle cx="43" cy="21" r="6" fill="#c8d4ff"/>
+  <rect x="13" y="31" width="15" height="21" rx="7.5" fill="#fff"/>
+  <rect x="36" y="31" width="15" height="21" rx="7.5" fill="#c8d4ff"/>
+  <path d="M29 33 42 41.5 29 50Z" fill="#fff" stroke="#315bff" stroke-width="3" stroke-linejoin="round"/>
+</svg>

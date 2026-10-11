@@ -20,6 +20,12 @@ function AdminLayout() {
   const group = m['common.systems.admin']();
   const navItems = [
     {
+      href: '/admin/traffic',
+      label: m['traffic.title'](),
+      icon: LayoutDashboard,
+      group,
+    },
+    {
       href: '/admin',
       label: m['admin.nav.overview'](),
       icon: LayoutDashboard,

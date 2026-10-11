@@ -18,6 +18,7 @@ import { getLocale, locales, localizeUrl } from '@/paraglide/runtime.js';
 import { Ads } from '@/components/analytics/ads';
 import { GoogleAnalytics } from '@/components/analytics/google-analytics';
 import { Plausible } from '@/components/analytics/plausible';
+import { VisitTracker } from '@/components/analytics/visit-tracker';
 import { CustomerService } from '@/components/customer-service';
 import { GoogleOneTap } from '@/components/google-one-tap';
 import { SandboxPreviewBridge } from '@/components/sandbox-preview-bridge';
@@ -120,6 +121,7 @@ function RootComponent() {
         disableTransitionOnChange
       >
         <Outlet />
+        <VisitTracker />
         <SandboxPreviewBridge />
         <Toaster position="top-center" richColors />
         <GoogleOneTap />

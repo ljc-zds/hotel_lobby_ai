@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import type { HotelTrack } from '@/types/hotel';
 import {
   ArrowLeftRight,
@@ -10,8 +11,10 @@ import {
   X,
 } from 'lucide-react';
 
+import { useSession } from '@/core/auth/client';
 import { Link } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
+import { apiGet, apiPost } from '@/lib/api-client';
 import { m } from '@/paraglide/messages.js';
 
 interface Photo {
@@ -24,23 +27,13 @@ export function HotelGenerator({
   onGenerated,
 }: {
   selected: HotelTrack;
-  onGenerated: (track: HotelTrack, quality: string) => void;
+  onGenerated: (track: HotelTrack, quality: string, videoUrl?: string) => void;
 }) {
   const resolutions = [
     {
-      quality: '480p',
-      credits: 20,
-      detail: m['hotel.copy.quick_preview_standard_definition_085'](),
-    },
-    {
-      quality: '720p',
-      credits: 45,
-      detail: m['hotel.copy.recommended_high_definition_086'](),
-    },
-    {
-      quality: '1080p',
-      credits: 80,
-      detail: m['hotel.copy.more_detail_full_hd_087'](),
+      quality: '768P',
+      credits: 0,
+      detail: 'MiniMax-H3 · 4s',
     },
   ];
   const id = useId();
@@ -49,9 +42,13 @@ export function HotelGenerator({
     null,
   ]);
   const photoRef = useRef(photos);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { data: session } = useSession();
+  const [taskId, setTaskId] = useState<string | null>(null);
+  const [videoUrl, setVideoUrl] = useState('');
+  const completed = useRef('');
+  const creationTrack = useRef(selected);
   const [errors, setErrors] = useState<[string, string]>(['', '']);
-  const [quality, setQuality] = useState('720p');
+  const [quality, setQuality] = useState('768P');
   const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState('');
@@ -61,10 +58,83 @@ export function HotelGenerator({
       photoRef.current.forEach((photo) => {
         if (photo) URL.revokeObjectURL(photo.url);
       });
-      if (timer.current) clearTimeout(timer.current);
     },
     []
   );
+  useEffect(() => {
+    if (session?.user) {
+      try {
+        setTaskId(
+          localStorage.getItem(`hotel-active-video:${session.user.id}`)
+        );
+      } catch {}
+    } else {
+      setTaskId(null);
+      setVideoUrl('');
+      setBusy(false);
+      setResult('');
+    }
+  }, [session?.user?.id]);
+  const task = useQuery<{ id: string; status: string; videoUrl?: string }>({
+    queryKey: ['video-task', session?.user?.id, taskId],
+    queryFn: () => apiGet(`/api/video?id=${encodeURIComponent(taskId!)}`),
+    enabled: !!taskId && !!session?.user,
+    refetchInterval: (query) =>
+      ['pending', 'processing'].includes(query.state.data?.status || 'pending')
+        ? 5000
+        : false,
+    retry: 2,
+  });
+  useEffect(() => {
+    if (!task.data || completed.current === task.data.id) return;
+    if (['pending', 'processing'].includes(task.data.status)) {
+      setBusy(true);
+      setResult(m['video.processing']());
+      return;
+    }
+    completed.current = task.data.id;
+    setBusy(false);
+    if (task.data.status === 'success' && task.data.videoUrl) {
+      setVideoUrl(task.data.videoUrl);
+      setResult(m['video.complete']());
+      onGenerated(creationTrack.current, '768P', task.data.videoUrl);
+    } else setResult(m['video.failed']());
+    if (session?.user) {
+      try {
+        localStorage.removeItem(`hotel-active-video:${session.user.id}`);
+      } catch {}
+    }
+  }, [task.data, session?.user?.id, onGenerated]);
+  useEffect(() => {
+    if (task.error) {
+      setBusy(false);
+      setResult(m['video.status_error']());
+    }
+  }, [task.error]);
+  const generation = useMutation({
+    mutationFn: (images: string[]) =>
+      apiPost<{ id: string }>('/api/video', {
+        trackId: creationTrack.current.id,
+        consent: true,
+        images,
+      }),
+    onSuccess: (data) => {
+      setTaskId(data.id);
+      if (session?.user) {
+        try {
+          localStorage.setItem(
+            `hotel-active-video:${session.user.id}`,
+            data.id
+          );
+        } catch {}
+      }
+      setResult(m['video.processing']());
+    },
+    onError: (error: Error) => {
+      setBusy(false);
+      setResult(error.message);
+    },
+  });
 
   function updatePhotos(next: [Photo | null, Photo | null]) {
     photoRef.current.forEach((photo) => {
@@ -74,6 +144,7 @@ export function HotelGenerator({
     photoRef.current = next;
     setPhotos(next);
     setResult('');
+    setVideoUrl('');
   }
 
   function choosePhoto(file: File | undefined, slot: 0 | 1) {
@@ -94,26 +165,59 @@ export function HotelGenerator({
     updatePhotos(next);
   }
 
-  const resolution = resolutions.find((item) => item.quality === quality)!;
   const ready = Boolean(photos[0] && photos[1] && consent);
 
-  function generate() {
+  async function generate() {
     if (!ready || busy) return;
-    const chosenTrack = selected;
-    const chosenQuality = quality;
+    if (!session?.user) {
+      setResult(m['video.sign_in']());
+      return;
+    }
+    creationTrack.current = selected;
     setBusy(true);
     setResult('');
-    timer.current = setTimeout(() => {
-      setBusy(false);
-      setResult(
-        m['hotel.copy.demo_complete_added_to_demo_creations_090']({
-          title: chosenTrack.title,
-          quality: chosenQuality,
-        })
+    setVideoUrl('');
+    try {
+      const images = await Promise.all(
+        photos.map(
+          (photo) =>
+            new Promise<string>((resolve, reject) => {
+              const image = new Image();
+              image.onload = () => {
+                const scale = Math.min(
+                  1,
+                  1024 / Math.max(image.naturalWidth, image.naturalHeight)
+                );
+                const canvas = document.createElement('canvas');
+                canvas.width = Math.max(
+                  1,
+                  Math.round(image.naturalWidth * scale)
+                );
+                canvas.height = Math.max(
+                  1,
+                  Math.round(image.naturalHeight * scale)
+                );
+                const ctx = canvas.getContext('2d');
+                if (!ctx) {
+                  reject(new Error(m['video.image_error']()));
+                  return;
+                }
+                ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+                const data = canvas.toDataURL('image/jpeg', 0.82);
+                if (data.length > 1_500_000)
+                  reject(new Error(m['video.image_error']()));
+                else resolve(data);
+              };
+              image.onerror = () => reject(new Error(m['video.image_error']()));
+              image.src = photo!.url;
+            })
+        )
       );
-      onGenerated(chosenTrack, chosenQuality);
-      timer.current = null;
-    }, 1400);
+      generation.mutate(images);
+    } catch (error) {
+      setBusy(false);
+      setResult(error instanceof Error ? error.message : m['video.failed']());
+    }
   }
 
   return (
@@ -294,9 +398,7 @@ export function HotelGenerator({
                   }}
                 >
                   <strong>{item.quality}</strong>
-                  <span>
-                    {m['hotel.generator.credit_count']({ count: item.credits })}
-                  </span>
+                  <span>{m['video.trial']()}</span>
                   <small>{item.detail}</small>
                 </button>
               ))}
@@ -321,12 +423,8 @@ export function HotelGenerator({
                 <strong>{quality}</strong>
               </div>
               <div>
-                <span>{m['hotel.copy.template_credits_113']()}</span>
-                <strong>
-                  {m['hotel.generator.credit_count']({
-                    count: resolution.credits,
-                  })}
-                </strong>
+                <span>{m['video.duration']()}</span>
+                <strong>4s</strong>
               </div>
               <small>
                 {m['hotel.copy.the_demo_does_not_spend_credits_114']()}
@@ -349,6 +447,9 @@ export function HotelGenerator({
             </button>
             <p className="studio-foot">
               {m['hotel.copy.add_two_photos_and_confirm_permission_117']()}
+              {!session?.user && (
+                <Link href="/sign-in"> {m['video.sign_in']()}</Link>
+              )}
             </p>
             <p className="studio-foot">
               <Link href="/terms-of-service">
@@ -362,6 +463,24 @@ export function HotelGenerator({
             <p role="status" aria-live="polite" className="privacy-note">
               {result}
             </p>
+            {videoUrl && (
+              <div className="space-y-3">
+                <video
+                  src={videoUrl}
+                  controls
+                  playsInline
+                  className="w-full rounded-xl"
+                />
+                <a
+                  href={videoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  {m['video.open']()}
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </div>

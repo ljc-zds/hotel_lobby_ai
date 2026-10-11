@@ -1,7 +1,7 @@
 export const meta = {
   title: 'Terms of Service',
   description: 'The terms and conditions for using our service.',
-  updated_at: '2026-10-09',
+  updated_at: '2026-10-11',
 };
 
 ## Acceptance of Terms
@@ -49,7 +49,7 @@ Include the page URL or creation identifier, the category of concern, a short ex
 
 ## Content Review and Report Handling
 
-**Current capabilities:** this website is a demo. Selected photos remain in your browser and are not sent to a video model or a server-side image screening service. The demo validates file type and size and requires confirmation of permission to use the photos. Those checks are not a review of the image's content. No automated image, prompt or generated-video moderation is currently connected.
+**Current capabilities:** real generation requires sign-in, photo-use consent and file validation. The server supplies a preset, family-safe scene prompt and submits the resized reference images to MiniMax-H3. MiniMax may reject requests under its own safety rules. File validation is not image-content review. We have not connected a separate content classifier and do not manually review every output before delivery. Reports are reviewed manually as described below.
 
 The platform operator reviews reports and content hosted by the service manually using this process:
 
@@ -62,11 +62,13 @@ If you believe a decision is incorrect, email the same address with the subject 
 
 ## Video Model Disclosure
 
-**Current video generation model: none — demo mode.** The creation interface simulates a result and records a local demo entry; it does not generate a new AI video. No Runway, Kling, Luma, Google Veo or other video model is connected to this workflow. Before enabling real generation, we will disclose the actual provider and model version and update the content review process to reflect the controls implemented.
+**Provider: MiniMax. Actual video model: MiniMax-H3, through the Video V2 API.** Two authorized reference photos are submitted to create a 4-second, 768P video. MiniMax-M3 is not used for this video workflow. Outputs are synthetic and may contain inaccuracies; identity, motion and sound are not guaranteed. Download a result promptly because provider download links expire.
+
+This limited launch requires sign-in and allows two submission attempts per account per UTC day, with ten attempts across the service per UTC day. Failed attempts count toward these limits. This workflow does not charge money or deduct displayed demo credits. Credit-pack purchases remain a demonstration and are not an active payment offer.
 
 ## Payment and Billing
 
-Paid features are billed in advance for the selected billing period. You are responsible for providing accurate billing information. Refunds are handled on a case-by-case basis in line with our refund policy.
+The current limited video launch is free within the submission limits above. Displayed credit packs and checkout confirmations are demonstrations; they do not collect payment or grant paid model usage. Before activating paid plans, we will publish the actual price, benefits, billing period and refund terms.
 
 ## Intellectual Property
 

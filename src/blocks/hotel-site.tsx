@@ -28,7 +28,13 @@ import { LocaleSelector } from '@/components/locale-selector';
 import '@/styles/hotel.css';
 import '@/styles/studio-theme.css';
 
-type DemoOrder = { id: string; track: string; quality: string; date: string };
+type DemoOrder = {
+  id: string;
+  track: string;
+  quality: string;
+  date: string;
+  videoUrl?: string;
+};
 export function HotelSite({
   page = 'home',
   children,
@@ -70,12 +76,13 @@ export function HotelSite({
       /* Ignore outdated demo data. */
     }
   }, []);
-  function generated(track: HotelTrack, quality: string) {
+  function generated(track: HotelTrack, quality: string, videoUrl?: string) {
     const next = [
       {
         id: crypto.randomUUID(),
         track: track.id,
         quality,
+        videoUrl,
         date: new Date().toISOString(),
       },
       ...orders,
@@ -213,7 +220,7 @@ export function HotelSite({
                       'HOTEL LOBBY AI',
                       '2 PHOTOS',
                       '16:9 MP4',
-                      '480P · 720P · 1080P',
+                      'MiniMax-H3 · 768P · 4s',
                     ].map((x) => (
                       <span key={x}>{x}</span>
                     ))}
@@ -517,10 +524,22 @@ export function HotelSite({
                         )}
                       </p>
                       <span>
-                        {m[
-                          'hotel.copy.demo_complete_no_ai_video_generated_066'
-                        ]()}
+                        {o.videoUrl
+                          ? m['video.complete']()
+                          : m[
+                              'hotel.copy.demo_complete_no_ai_video_generated_066'
+                            ]()}
                       </span>
+                      {o.videoUrl && /^https:\/\//.test(o.videoUrl) && (
+                        <a
+                          href={o.videoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline"
+                        >
+                          {m['video.open']()}
+                        </a>
+                      )}
                     </div>
                     <Link href="/#video-generator">
                       {m['hotel.copy.create_again_067']()}

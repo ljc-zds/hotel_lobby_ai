@@ -24,7 +24,12 @@ function safeDecodeCallbackUrl(raw?: string | null) {
   if (!raw) return '/';
   try {
     const decoded = decodeURIComponent(raw);
-    if (decoded.startsWith('/')) return decoded;
+    if (
+      decoded.startsWith('/') &&
+      !decoded.startsWith('//') &&
+      !decoded.includes('\\')
+    )
+      return decoded;
     return '/';
   } catch {
     return '/';
@@ -194,7 +199,10 @@ function VerifyEmailPage() {
       setLoading(true);
       const result = await authClient.sendVerificationEmail({
         email,
-        callbackURL: localizeHref(nextUrl || '/'),
+        callbackURL: new URL(
+          localizeHref(nextUrl || '/'),
+          window.location.origin
+        ).href,
       });
       if (result?.error) {
         toast.error(

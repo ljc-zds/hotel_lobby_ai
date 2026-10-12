@@ -37,4 +37,6 @@ for (const path of paths) {
   console.log(`${path}: ${seconds.toFixed(2)}s, H.264 + AAC`);
 }
 assert.equal(hashes.size, 14, 'Preview files must contain distinct media');
-console.log('All 14 template previews verified.');
+console.log(
+  'All 14 stored videos passed format checks. Subject motion must be checked separately with decoded frames.'
+);

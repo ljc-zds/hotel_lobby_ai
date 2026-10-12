@@ -2,6 +2,18 @@ import type { HotelTrack } from '@/types/hotel';
 
 import { m } from '@/paraglide/messages.js';
 
+// These source previews contain only a still image with camera zoom and music.
+// Keep their source records for provenance, but do not offer them as motion templates.
+const hiddenPreviewTracks = new Set([
+  'orange-formal-duo',
+  'orange-corgis',
+  'marble-checkin',
+  'neon-elevator',
+  'moon-gate',
+  'wedding-lounge',
+  'gold-atrium',
+]);
+
 export function getHotelTracks(locale?: 'en' | 'zh'): HotelTrack[] {
   return [
     {
@@ -195,5 +207,5 @@ export function getHotelTracks(locale?: 'en' | 'zh'): HotelTrack[] {
       image: '/reference/corgi-rooftop-poster-v3.webp',
       video: '/reference/corgi-rooftop-v2.mp4',
     },
-  ];
+  ].filter((track) => !hiddenPreviewTracks.has(track.id));
 }

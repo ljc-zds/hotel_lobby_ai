@@ -102,17 +102,23 @@ export function HotelGallery({
           role="group"
           aria-label={m['hotel.copy.template_categories_122']()}
         >
-          {categories.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className={`filter${category === item.id ? 'active' : ''}`}
-              aria-pressed={category === item.id}
-              onClick={() => setCategory(item.id)}
-            >
-              {item.label}
-            </button>
-          ))}
+          {categories
+            .filter(
+              (item) =>
+                item.id === 'all' ||
+                items.some((track) => track.category === item.id)
+            )
+            .map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                className={`filter${category === item.id ? 'active' : ''}`}
+                aria-pressed={category === item.id}
+                onClick={() => setCategory(item.id)}
+              >
+                {item.label}
+              </button>
+            ))}
         </div>
       </div>
       <p className="template-audio-note">

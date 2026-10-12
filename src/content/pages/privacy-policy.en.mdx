@@ -1,7 +1,7 @@
 export const meta = {
   title: 'Privacy Policy',
   description: 'How we collect, use, and protect your personal information.',
-  updated_at: '2026-10-11',
+  updated_at: '2026-10-12',
 };
 
 ## Introduction
@@ -22,7 +22,7 @@ We collect the following types of information to provide and improve our service
 
 Photos remain in browser memory during preview. When you confirm authorization and submit a generation request, the browser resizes the two photos and sends them through our authenticated server to MiniMax's Video V2 API using MiniMax-H3. Please do not upload sensitive or unauthorized images. Our application does not save the original input photos to its database or object storage. MiniMax processes the submitted references under its own privacy policy and service terms; we do not promise that its processing, retention or training practices match ours.
 
-We store account-linked task identifiers, scene, model, status, timestamps, preset prompt and result links to provide generation status and resolve support requests. Provider links expire. Browser creation history may also retain these result links until you clear it. Contact us to request deletion of account-linked task records; legal and abuse-prevention obligations may require retaining limited records.
+We store account-linked task identifiers, scene, model, status, timestamps, preset prompt and result links to provide generation status and resolve support requests. Completed videos are copied from the provider to private Cloudflare R2 storage. Playback links require sign-in and are checked against the owning account. Browser storage may retain the active task identifier to resume status checks; your video library is linked to your account. Contact us to request deletion of account-linked task records; legal and abuse-prevention obligations may require retaining limited records.
 
 ## Visitor Statistics
 

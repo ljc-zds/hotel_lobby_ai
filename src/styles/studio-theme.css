@@ -98,6 +98,26 @@
   font-size: 14px;
   line-height: 1.6;
 }
+.hotel-site .studio-foot .studio-account-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  margin: 8px 0 0 8px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  background: var(--studio-blue);
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+}
+.hotel-site .studio-foot .studio-account-action:hover {
+  filter: brightness(0.9);
+}
+.hotel-site .studio-foot .studio-account-action:focus-visible {
+  outline: 2px solid var(--studio-blue);
+  outline-offset: 3px;
+}
 .hotel-site .hero-copy p {
   color: var(--studio-muted);
   font-size: 16px;

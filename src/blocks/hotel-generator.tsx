@@ -12,10 +12,11 @@ import {
 } from 'lucide-react';
 
 import { useSession } from '@/core/auth/client';
-import { Link } from '@/core/i18n/navigation';
+import { Link, useRouter } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
 import { VIDEO_CREDIT_COST } from '@/config/video';
 import { apiGet, apiPost } from '@/lib/api-client';
+import { videoGenerationAction } from '@/lib/video-generation-action';
 import { m } from '@/paraglide/messages.js';
 
 interface Photo {
@@ -36,7 +37,8 @@ export function HotelGenerator({
     null,
   ]);
   const photoRef = useRef(photos);
-  const { data: session } = useSession();
+  const { data: session, isPending: sessionPending } = useSession();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const balanceQuery = useQuery({
     queryKey: ['hotel-credit-balance', session?.user?.id],
@@ -185,17 +187,30 @@ export function HotelGenerator({
   }
 
   const ready = Boolean(photos[0] && photos[1] && consent);
+  const action = videoGenerationAction({
+    busy,
+    sessionPending,
+    signedIn: !!session?.user,
+    balancePending: balanceQuery.isPending,
+    balanceError: balanceQuery.isError,
+    balance: balanceQuery.data?.balance ?? 0,
+    ready,
+  });
 
   async function generate() {
-    if (!ready || busy) return;
-    if (!session?.user) {
-      setResult(m['video.sign_in']());
+    if (action === 'sign-in') {
+      router.push('/sign-in?callbackUrl=%2F%23video-generator');
       return;
     }
-    if (!hasCredits) {
-      setResult(m['video.insufficient_credits']());
+    if (action === 'retry-balance') {
+      void balanceQuery.refetch();
       return;
     }
+    if (action === 'buy-credits') {
+      router.push('/pricing');
+      return;
+    }
+    if (action !== 'generate') return;
     creationTrack.current = selected;
     setBusy(true);
     setResult('');
@@ -428,7 +443,7 @@ export function HotelGenerator({
             <button
               className="primary-action"
               type="button"
-              disabled={!ready || busy || (!!session?.user && !hasCredits)}
+              disabled={action === 'wait' || action === 'prepare-photos'}
               onClick={generate}
             >
               {busy ? (
@@ -438,18 +453,28 @@ export function HotelGenerator({
               )}
               {busy
                 ? m['hotel.copy.preparing_demo_115']()
-                : m['hotel.copy.run_demo_116']()}
+                : action === 'retry-balance'
+                  ? m['video.retry_balance']()
+                  : m['hotel.copy.run_demo_116']()}
             </button>
-            {session?.user && !balanceQuery.isLoading && !hasCredits && (
+            {session?.user && balanceQuery.isSuccess && !hasCredits && (
               <p className="studio-foot">
                 {m['video.insufficient_credits']()}{' '}
-                <Link href="/pricing">{m['video.buy_credits']()}</Link>
+                <Link href="/pricing" className="studio-account-action">
+                  {m['video.buy_credits']()}
+                </Link>
               </p>
             )}
             <p className="studio-foot">
               {m['hotel.copy.add_two_photos_and_confirm_permission_117']()}
               {!session?.user && (
-                <Link href="/sign-in"> {m['video.sign_in']()}</Link>
+                <Link
+                  href="/sign-in?callbackUrl=%2F%23video-generator"
+                  className="studio-account-action"
+                >
+                  {' '}
+                  {m['video.sign_in']()}
+                </Link>
               )}
             </p>
             <p className="studio-foot">

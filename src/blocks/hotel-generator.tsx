@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { HotelTrack } from '@/types/hotel';
 import {
   ArrowLeftRight,
@@ -14,6 +14,7 @@ import {
 import { useSession } from '@/core/auth/client';
 import { Link } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
+import { VIDEO_CREDIT_COST } from '@/config/video';
 import { apiGet, apiPost } from '@/lib/api-client';
 import { m } from '@/paraglide/messages.js';
 
@@ -36,6 +37,13 @@ export function HotelGenerator({
   ]);
   const photoRef = useRef(photos);
   const { data: session } = useSession();
+  const queryClient = useQueryClient();
+  const balanceQuery = useQuery({
+    queryKey: ['hotel-credit-balance', session?.user?.id],
+    queryFn: () => apiGet<{ balance: number }>('/api/video/balance'),
+    enabled: !!session?.user,
+  });
+  const hasCredits = (balanceQuery.data?.balance ?? 0) >= VIDEO_CREDIT_COST;
   const [taskId, setTaskId] = useState<string | null>(null);
   const [videoUrl, setVideoUrl] = useState('');
   const completed = useRef('');
@@ -97,6 +105,7 @@ export function HotelGenerator({
       return;
     }
     completed.current = task.data.id;
+    void queryClient.invalidateQueries({ queryKey: ['hotel-credit-balance'] });
     setBusy(false);
     if (task.data.status === 'success' && task.data.videoUrl) {
       setVideoUrl(task.data.videoUrl);
@@ -123,6 +132,9 @@ export function HotelGenerator({
         images,
       }),
     onSuccess: (data: { id: string }) => {
+      void queryClient.invalidateQueries({
+        queryKey: ['hotel-credit-balance'],
+      });
       setTaskId(data.id);
       if (session?.user) {
         try {
@@ -135,6 +147,9 @@ export function HotelGenerator({
       setResult(m['video.processing']());
     },
     onError: (error: Error) => {
+      void queryClient.invalidateQueries({
+        queryKey: ['hotel-credit-balance'],
+      });
       setBusy(false);
       setResult(error.message);
     },
@@ -175,6 +190,10 @@ export function HotelGenerator({
     if (!ready || busy) return;
     if (!session?.user) {
       setResult(m['video.sign_in']());
+      return;
+    }
+    if (!hasCredits) {
+      setResult(m['video.insufficient_credits']());
       return;
     }
     creationTrack.current = selected;
@@ -396,6 +415,12 @@ export function HotelGenerator({
                 <span>{m['video.duration']()}</span>
                 <strong>10s</strong>
               </div>
+              <div>
+                <span>{m['video.cost_label']()}</span>
+                <strong>
+                  {m['video.cost']({ credits: VIDEO_CREDIT_COST })}
+                </strong>
+              </div>
               <small>
                 {m['hotel.copy.the_demo_does_not_spend_credits_114']()}
               </small>
@@ -403,7 +428,7 @@ export function HotelGenerator({
             <button
               className="primary-action"
               type="button"
-              disabled={!ready || busy}
+              disabled={!ready || busy || (!!session?.user && !hasCredits)}
               onClick={generate}
             >
               {busy ? (
@@ -415,6 +440,12 @@ export function HotelGenerator({
                 ? m['hotel.copy.preparing_demo_115']()
                 : m['hotel.copy.run_demo_116']()}
             </button>
+            {session?.user && !balanceQuery.isLoading && !hasCredits && (
+              <p className="studio-foot">
+                {m['video.insufficient_credits']()}{' '}
+                <Link href="/pricing">{m['video.buy_credits']()}</Link>
+              </p>
+            )}
             <p className="studio-foot">
               {m['hotel.copy.add_two_photos_and_confirm_permission_117']()}
               {!session?.user && (

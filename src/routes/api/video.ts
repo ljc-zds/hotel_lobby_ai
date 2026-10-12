@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import { MiniMaxApiError } from '@/core/ai';
 import { getAuth } from '@/core/auth';
+import { InsufficientVideoCredits } from '@/core/credits/video';
 import { VideoStorageError } from '@/core/storage/video';
 import { envConfigs } from '@/config';
 import { listVideos, queryVideo, startVideo } from '@/modules/video/service';
@@ -60,8 +61,8 @@ async function POST({ request }: { request: Request }) {
       return respErr(error.message, { status: error.status });
     if (error instanceof z.ZodError || error instanceof SyntaxError)
       return respErr('Invalid images or consent.', { status: 400 });
-    if (error instanceof Error && error.message.startsWith('Daily video limit'))
-      return respErr(error.message, { status: 429 });
+    if (error instanceof InsufficientVideoCredits)
+      return respErr(error.message, { status: 402 });
     return respErr(
       'Video generation could not start. Please try again later.',
       { status: 502 }

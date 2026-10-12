@@ -58,7 +58,7 @@ export function HotelSite({
   const router = useRouter();
   const balanceQuery = useQuery({
     queryKey: ['hotel-credit-balance', session?.user?.id],
-    queryFn: () => apiGet<{ balance: number }>('/api/credits'),
+    queryFn: () => apiGet<{ balance: number }>('/api/video/balance'),
     enabled: !!session?.user,
   });
   const credits = session?.user ? (balanceQuery.data?.balance ?? 0) : 0;

@@ -288,16 +288,6 @@ export function getAuth(configs?: Record<string, string>) {
             } catch (error) {
               console.error('[auth] grant default role failed', error);
             }
-
-            try {
-              await grantForNewUser({
-                userId: createdUser.id,
-                userEmail: createdUser.email,
-                configs: all,
-              });
-            } catch (error) {
-              console.error('[auth] grant signup credits failed', error);
-            }
           },
         },
       },

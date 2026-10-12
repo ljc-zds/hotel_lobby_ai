@@ -1,9 +1,11 @@
 import { and, desc, eq, isNull } from 'drizzle-orm';
 
 import { AIMediaType, MiniMaxProvider } from '@/core/ai';
+import { refundVideoCredits, reserveVideoCredits } from '@/core/credits/video';
 import { db } from '@/core/db';
 import { archiveVideo, getVideoStorage } from '@/core/storage/video';
-import { aiTask, config } from '@/config/db/schema';
+import { aiTask } from '@/config/db/schema';
+import { VIDEO_CREDIT_COST } from '@/config/video';
 import { videoCallbackUrl } from '@/lib/video-callback';
 
 const provider = () =>
@@ -13,29 +15,12 @@ export async function startVideo(
   track: { id: string; description: string },
   images: string[]
 ) {
-  // Check storage before spending provider credits or reserving the daily quota.
+  // Check storage before reserving paid credits or calling the provider.
   await getVideoStorage();
-  const day = new Date().toISOString().slice(0, 10);
   const id = crypto.randomUUID();
   const prompt = `Create a family-safe music performance video with both subjects from reference image 1 and reference image 2 together. Preserve their identities. Scene: ${track.description}. Natural movement, no violence, nudity, sexual content, hateful content or deceptive impersonation. No text or logos.`;
-  // Lock a shared quota row before creating a reservation; enforce limits across server instances.
   await db().transaction(async (tx: any) => {
-    const name = `video-quota:${day}`;
-    await tx.insert(config).values({ name, value: '{}' }).onConflictDoNothing();
-    const [row] = await tx
-      .select()
-      .from(config)
-      .where(eq(config.name, name))
-      .for('update');
-    const quota = JSON.parse(row.value || '{}');
-    if ((quota.total || 0) >= 10 || (quota[userId] || 0) >= 2)
-      throw new Error('Daily video limit reached. Please try again tomorrow.');
-    quota.total = (quota.total || 0) + 1;
-    quota[userId] = (quota[userId] || 0) + 1;
-    await tx
-      .update(config)
-      .set({ value: JSON.stringify(quota) })
-      .where(eq(config.name, name));
+    const creditId = await reserveVideoCredits(tx, userId, id);
     await tx.insert(aiTask).values({
       id,
       userId,
@@ -44,7 +29,8 @@ export async function startVideo(
       model: 'MiniMax-H3',
       prompt,
       status: 'pending',
-      costCredits: 0,
+      costCredits: VIDEO_CREDIT_COST,
+      creditId,
       scene: track.id,
       options: JSON.stringify({ resolution: '768P', duration: 10 }),
     });
@@ -69,12 +55,22 @@ export async function startVideo(
       .where(eq(aiTask.id, id));
     return { id, status: 'processing' };
   } catch (error) {
-    await db()
-      .update(aiTask)
-      .set({ status: 'failed' })
-      .where(eq(aiTask.id, id));
+    await failVideo(id, 'failed');
     throw error;
   }
+}
+
+async function failVideo(id: string, status: 'failed' | 'canceled') {
+  return db().transaction(async (tx: any) => {
+    const [task] = await tx
+      .select()
+      .from(aiTask)
+      .where(eq(aiTask.id, id))
+      .for('update');
+    if (!task || task.status === 'success') return;
+    await refundVideoCredits(tx, task.userId, task.creditId);
+    await tx.update(aiTask).set({ status }).where(eq(aiTask.id, id));
+  });
 }
 
 export async function queryVideo(userId: string, id: string) {
@@ -93,8 +89,10 @@ export async function queryVideo(userId: string, id: string) {
   const saved = task.taskResult ? JSON.parse(task.taskResult) : {};
   if (task.status === 'success' && saved.storage === 'r2')
     return { id, status: 'success', videoUrl: `/api/video/file?id=${id}` };
-  if (task.status === 'failed' || task.status === 'canceled')
+  if (task.status === 'failed' || task.status === 'canceled') {
+    await failVideo(id, task.status);
     return { id, status: task.status };
+  }
   if (saved.archiveStartedAt && Date.now() - saved.archiveStartedAt < 180_000)
     return { id, status: 'processing', storageStatus: 'saving' };
   if (saved.retryAfter > Date.now())
@@ -109,6 +107,10 @@ export async function queryVideo(userId: string, id: string) {
       : eq(aiTask.taskResult, task.taskResult)
   );
   if (result.taskStatus !== 'success') {
+    if (result.taskStatus === 'failed' || result.taskStatus === 'canceled') {
+      await failVideo(id, result.taskStatus);
+      return { id, status: result.taskStatus };
+    }
     await db()
       .update(aiTask)
       .set({ status: result.taskStatus })

@@ -917,7 +917,7 @@
   "hotel.copy.check_your_credits_and_creations_then_059": "查看积分与作品，接着创作下一支视频。",
   "hotel.copy.demo_credits_060": "演示积分",
   "hotel.copy.add_credits_061": "添加积分",
-  "hotel.copy.demo_creations_062": "近期作品",
+  "hotel.copy.demo_creations_062": "我的视频",
   "hotel.copy.this_page_shows_demo_data_saved_063": "本浏览器保存近期作品和旧的演示记录。视频下载链接可能过期，请及时保存已完成的视频。",
   "hotel.copy.sign_in_064": "登录账户",
   "hotel.copy.to_use_the_account_features_065": "可使用项目原有的账户功能。",
@@ -1049,5 +1049,8 @@
   "hotel.payment.billing": "查看账单和积分",
   "hotel.payment.buy": "购买积分",
   "hotel.payment.unavailable": "暂时无法结账，请稍后重试。",
-  "hotel.payment.notice": "付款验证成功后，积分会自动发放到你的账户。"
+  "hotel.payment.notice": "付款验证成功后，积分会自动发放到你的账户。",
+  "video.saving": "视频已生成，正在保存到安全存储…",
+  "video.storage_retry": "视频已生成，保存暂时未成功，正在自动重试…",
+  "video.library_note": "这里展示此账户的视频记录。保存成功的视频可长期播放和下载。"
 }

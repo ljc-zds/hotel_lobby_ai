@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import { MiniMaxApiError } from '@/core/ai';
 import { getAuth } from '@/core/auth';
+import { VideoStorageError } from '@/core/storage/video';
 import { envConfigs } from '@/config';
 import { listVideos, queryVideo, startVideo } from '@/modules/video/service';
 import { enforceMinIntervalRateLimit } from '@/lib/rate-limit';
@@ -53,6 +54,8 @@ async function POST({ request }: { request: Request }) {
       noStore
     );
   } catch (error) {
+    if (error instanceof VideoStorageError)
+      return respErr(error.message, { status: 503 });
     if (error instanceof MiniMaxApiError)
       return respErr(error.message, { status: error.status });
     if (error instanceof z.ZodError || error instanceof SyntaxError)

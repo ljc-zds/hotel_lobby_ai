@@ -917,7 +917,7 @@
   "hotel.copy.check_your_credits_and_creations_then_059": "Check your credits and creations, then start your next video.",
   "hotel.copy.demo_credits_060": "Demo credits",
   "hotel.copy.add_credits_061": "Add credits",
-  "hotel.copy.demo_creations_062": "Recent creations",
+  "hotel.copy.demo_creations_062": "My videos",
   "hotel.copy.this_page_shows_demo_data_saved_063": "This browser stores your recent creations and legacy demo records. Video download links may expire; save your completed videos promptly. ",
   "hotel.copy.sign_in_064": "Sign in",
   "hotel.copy.to_use_the_account_features_065": " to use the account features.",
@@ -1049,5 +1049,8 @@
   "hotel.payment.billing": "View billing and credits",
   "hotel.payment.buy": "Buy credits",
   "hotel.payment.unavailable": "Checkout is unavailable. Please try again.",
-  "hotel.payment.notice": "Credits are added to your account after payment is verified."
+  "hotel.payment.notice": "Credits are added to your account after payment is verified.",
+  "video.saving": "Video generated. Saving to secure storage…",
+  "video.storage_retry": "Video generated. Storage is temporarily unavailable; retrying automatically…",
+  "video.library_note": "These are your account’s videos. Saved videos remain available to play and download."
 }

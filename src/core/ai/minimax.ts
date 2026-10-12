@@ -110,6 +110,7 @@ export class MiniMaxProvider implements AIProvider {
       resolution,
       duration,
       ratio: '16:9',
+      ...(options.callback_url ? { callback_url: options.callback_url } : {}),
     });
     if (typeof data.task_id !== 'string' || !data.task_id) {
       throw new Error('MiniMax did not return a video task ID.');

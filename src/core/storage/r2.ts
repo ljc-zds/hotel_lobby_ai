@@ -72,12 +72,14 @@ export class R2Provider implements StorageProvider {
         accessKeyId: this.configs.accessKeyId,
         secretAccessKey: this.configs.secretAccessKey,
         region: this.configs.region || 'auto',
+        retries: 2,
       });
 
       const response = await client.fetch(
         new Request(url, {
           method: 'HEAD',
-        })
+        }),
+        { signal: AbortSignal.timeout(15_000) }
       );
 
       return response.ok;
@@ -117,6 +119,7 @@ export class R2Provider implements StorageProvider {
         accessKeyId: this.configs.accessKeyId,
         secretAccessKey: this.configs.secretAccessKey,
         region: this.configs.region || 'auto',
+        retries: 2,
       });
 
       const headers: Record<string, string> = {
@@ -129,9 +132,10 @@ export class R2Provider implements StorageProvider {
         method: 'PUT',
         headers,
         body: bodyArray as any,
+        signal: AbortSignal.timeout(60_000),
       });
 
-      const response = await client.fetch(request);
+      const response = await client.fetch(request, { signal: request.signal });
 
       if (!response.ok) {
         return {
@@ -161,6 +165,28 @@ export class R2Provider implements StorageProvider {
         provider: this.name,
       };
     }
+  }
+
+  /** Signed private object reads; forwards Range for seeking in video players. */
+  async readFile(
+    key: string,
+    options: { range?: string; head?: boolean } = {}
+  ) {
+    const { AwsClient } = await import('aws4fetch');
+    const client = new AwsClient({
+      accessKeyId: this.configs.accessKeyId,
+      secretAccessKey: this.configs.secretAccessKey,
+      region: this.configs.region || 'auto',
+      retries: 2,
+    });
+    const url = `${this.getEndpoint()}/${this.configs.bucket}/${this.getUploadPath()}/${key}`;
+    return client.fetch(
+      new Request(url, {
+        method: options.head ? 'HEAD' : 'GET',
+        headers: options.range ? { Range: options.range } : {},
+      }),
+      { signal: AbortSignal.timeout(60_000) }
+    );
   }
 
   async downloadAndUpload(

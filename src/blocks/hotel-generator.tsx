@@ -75,11 +75,16 @@ export function HotelGenerator({
       setResult('');
     }
   }, [session?.user?.id]);
-  const task = useQuery<{ id: string; status: string; videoUrl?: string }>({
+  const task = useQuery<{
+    id: string;
+    status: string;
+    videoUrl?: string;
+    storageStatus?: string;
+  }>({
     queryKey: ['video-task', session?.user?.id, taskId],
     queryFn: () => apiGet(`/api/video?id=${encodeURIComponent(taskId!)}`),
     enabled: !!taskId && !!session?.user,
-    refetchInterval: (query) =>
+    refetchInterval: (query: { state: { data?: { status: string } } }) =>
       ['pending', 'processing'].includes(query.state.data?.status || 'pending')
         ? 5000
         : false,
@@ -89,7 +94,13 @@ export function HotelGenerator({
     if (!task.data || completed.current === task.data.id) return;
     if (['pending', 'processing'].includes(task.data.status)) {
       setBusy(true);
-      setResult(m['video.processing']());
+      setResult(
+        task.data.storageStatus === 'retrying'
+          ? m['video.storage_retry']()
+          : task.data.storageStatus === 'saving'
+            ? m['video.saving']()
+            : m['video.processing']()
+      );
       return;
     }
     completed.current = task.data.id;
@@ -118,7 +129,7 @@ export function HotelGenerator({
         consent: true,
         images,
       }),
-    onSuccess: (data) => {
+    onSuccess: (data: { id: string }) => {
       setTaskId(data.id);
       if (session?.user) {
         try {

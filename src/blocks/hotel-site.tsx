@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import type { HotelTrack } from '@/types/hotel';
 import {
@@ -30,11 +30,11 @@ import { LocaleSelector } from '@/components/locale-selector';
 import '@/styles/hotel.css';
 import '@/styles/studio-theme.css';
 
-type DemoOrder = {
+type VideoOrder = {
   id: string;
-  track: string;
-  quality: string;
-  date: string;
+  scene: string | null;
+  status: string;
+  createdAt: string;
   videoUrl?: string;
 };
 export function HotelSite({
@@ -48,7 +48,13 @@ export function HotelSite({
   const { data: session } = useSession();
   const [selected, setSelected] = useState(tracks[0]);
   const [menu, setMenu] = useState(false);
-  const [orders, setOrders] = useState<DemoOrder[]>([]);
+  const videoQuery = useQuery({
+    queryKey: ['hotel-videos', session?.user?.id],
+    queryFn: () => apiGet<VideoOrder[]>('/api/video'),
+    enabled: !!session?.user,
+    refetchInterval: page === 'orders' ? 10_000 : false,
+  });
+  const orders: VideoOrder[] = session?.user ? (videoQuery.data ?? []) : [];
   const router = useRouter();
   const balanceQuery = useQuery({
     queryKey: ['hotel-credit-balance', session?.user?.id],
@@ -63,56 +69,14 @@ export function HotelSite({
         redirect:
           getLocale() === 'zh' ? '/zh/settings/billing' : '/settings/billing',
       }),
-    onSuccess: ({ checkout_url }) => {
+    onSuccess: ({ checkout_url }: { checkout_url: string }) => {
       if (!checkout_url) throw new Error(m['hotel.payment.unavailable']());
       window.location.assign(checkout_url);
     },
     onError: (error: Error) => toast.error(error.message),
   });
-  useEffect(() => {
-    try {
-      const stored = JSON.parse(
-        localStorage.getItem('hotel-demo-orders') || '[]'
-      );
-      if (Array.isArray(stored))
-        setOrders(
-          stored
-            .map((x) => ({
-              ...x,
-              track:
-                getHotelTracks('zh').find((t) => t.title === x.track)?.id ||
-                getHotelTracks('en').find((t) => t.title === x.track)?.id ||
-                x.track,
-            }))
-            .filter(
-              (x) =>
-                typeof x.id === 'string' &&
-                typeof x.track === 'string' &&
-                typeof x.quality === 'string' &&
-                typeof x.date === 'string'
-            )
-        );
-    } catch {
-      /* Ignore outdated demo data. */
-    }
-  }, []);
-  function generated(track: HotelTrack, quality: string, videoUrl?: string) {
-    const next = [
-      {
-        id: crypto.randomUUID(),
-        track: track.id,
-        quality,
-        videoUrl,
-        date: new Date().toISOString(),
-      },
-      ...orders,
-    ].slice(0, 20);
-    setOrders(next);
-    try {
-      localStorage.setItem('hotel-demo-orders', JSON.stringify(next));
-    } catch {
-      toast.info(m['hotel.copy.your_browser_could_not_save_the_001']());
-    }
+  function generated() {
+    void videoQuery.refetch();
   }
   function buyPack(productId: string) {
     if (!session?.user) {
@@ -530,9 +494,11 @@ export function HotelSite({
               </article>
             </div>
             <div className="hotel-demo-notice">
-              {m['hotel.copy.this_page_shows_demo_data_saved_063']()}
-              <Link href="/sign-in">{m['hotel.copy.sign_in_064']()}</Link>
-              {m['hotel.copy.to_use_the_account_features_065']()}
+              {session?.user ? (
+                m['video.library_note']()
+              ) : (
+                <Link href="/sign-in">{m['video.sign_in']()}</Link>
+              )}
             </div>
             {orders.length ? (
               <div className="hotel-order-list">
@@ -540,38 +506,41 @@ export function HotelSite({
                   <article key={o.id}>
                     <img
                       src={
-                        tracks.find((t) => t.id === o.track)?.image ||
+                        tracks.find((t) => t.id === o.scene)?.image ||
                         tracks[0].image
                       }
                       alt=""
                     />
                     <div>
                       <h3>
-                        {tracks.find((t) => t.id === o.track)?.title || o.track}
+                        {tracks.find((t) => t.id === o.scene)?.title || o.scene}
                       </h3>
                       <p>
-                        {o.quality} ·{' '}
-                        {new Date(o.date).toLocaleString(
+                        768P ·{' '}
+                        {new Date(o.createdAt).toLocaleString(
                           getLocale() === 'zh' ? 'zh-CN' : 'en-US'
                         )}
                       </p>
                       <span>
                         {o.videoUrl
                           ? m['video.complete']()
-                          : m[
-                              'hotel.copy.demo_complete_no_ai_video_generated_066'
-                            ]()}
+                          : ['failed', 'canceled'].includes(o.status)
+                            ? m['video.failed']()
+                            : m['video.processing']()}
                       </span>
-                      {o.videoUrl && /^https:\/\//.test(o.videoUrl) && (
-                        <a
-                          href={o.videoUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline"
-                        >
-                          {m['video.open']()}
-                        </a>
-                      )}
+                      {o.videoUrl &&
+                        /^\/api\/video\/file\?id=[0-9a-f-]{36}$/i.test(
+                          o.videoUrl
+                        ) && (
+                          <a
+                            href={o.videoUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline"
+                          >
+                            {m['video.open']()}
+                          </a>
+                        )}
                     </div>
                     <Link href="/#video-generator">
                       {m['hotel.copy.create_again_067']()}

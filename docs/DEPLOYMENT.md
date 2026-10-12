@@ -24,4 +24,16 @@ Generate with `NODE_ENV=production pnpm exec drizzle-kit generate --config=drizz
 
 ## Product status
 
-The video generator, credits and orders currently demonstrate the template flow. Photos preview locally; this UI does not generate real AI video or charge money. Authentication uses the production database. AI provider and payment integration require separate configuration and implementation.
+The generator uses MiniMax-H3 (768P, 4 seconds). Waffo Pancake is integrated for checkout and payment webhooks. Provider credentials are configured separately from the source code.
+
+## Video archival to private R2
+
+Configure the existing admin Settings → Storage → R2 fields: account ID, bucket name, Access Key ID, Secret Access Key, and optionally upload path. Use credentials with object read/write access to this bucket. Alternatively, the server supports `STORAGE_ENDPOINT`, `STORAGE_ACCESS_KEY`, `STORAGE_SECRET_KEY`, and `STORAGE_BUCKET`. Encrypted database settings take precedence. Keep these credentials server-only. A public bucket or public domain is unnecessary.
+
+New generation requests check storage configuration before reserving quota or calling MiniMax. Production HTTPS requests include a per-task authenticated callback at `/api/video/callback`. The callback validates its token and queries MiniMax directly; supplied callback URLs are never downloaded. Browser polling provides the same completion path. Confirm the provider's challenge handshake in a live generation test after deployment.
+
+Successful output is validated and copied into `uploads/videos/<task-uuid>.mp4` (or the configured upload path). The database records the R2 object key and marks success only after upload. A three-minute persisted lease prevents duplicate transfers; interrupted transfers can be retried. Storage failures leave the task processing and retry after 30 seconds on polling or callback redelivery. Callback retries depend on MiniMax's delivery policy; reopening an unfinished task resumes polling.
+
+Playback and downloads use `/api/video/file?id=<task-uuid>` on the website domain. This endpoint checks the signed-in user owns the task, reads the private object, and supports HTTP Range/HEAD requests for seeking. Video history comes from the account's database records, including records older than seven days, rather than browser demo storage. No automatic R2 expiration is added; existing bucket lifecycle rules still apply.
+
+Existing successful tasks are archived when queried again while MiniMax can still return their output. Older browser-only history cannot be recovered automatically.

@@ -6,7 +6,11 @@ import { z } from 'zod';
 import { authClient, signIn, useSession } from '@/core/auth/client';
 import { Link, useRouter } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
-import { resolveAfterAuthUrl, safeInternalPath } from '@/lib/redirect';
+import {
+  DEFAULT_POST_AUTH_PATH,
+  resolveAfterAuthUrl,
+  safeInternalPath,
+} from '@/lib/redirect';
 import { m } from '@/paraglide/messages.js';
 import { localizeHref } from '@/paraglide/runtime.js';
 import { usePublicConfig } from '@/hooks/use-public-config';
@@ -55,7 +59,7 @@ function SignInPage() {
     if (sessionPending || navigatingRef.current) return;
     if (session?.user) {
       navigatingRef.current = true;
-      router.push('/');
+      router.push(DEFAULT_POST_AUTH_PATH);
     }
   }, [sessionPending, session?.user, router]);
 
@@ -65,7 +69,7 @@ function SignInPage() {
   const afterLoginUrl = resolveAfterAuthUrl({
     redirect: redirectParam,
     callbackUrl,
-    fallback: '/settings',
+    fallback: DEFAULT_POST_AUTH_PATH,
   });
 
   // Carry callbackUrl/redirect across to sign-up so the destination survives the switch.

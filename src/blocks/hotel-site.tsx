@@ -149,10 +149,19 @@ export function HotelSite({
             <Link
               href={session?.user ? '/settings' : '/sign-in'}
               className="hotel-login hotel-account"
-              aria-label={m['hotel.nav.account']()}
+              aria-label={session?.user?.email || m['hotel.nav.account']()}
+              title={session?.user?.email || m['hotel.nav.account']()}
             >
-              <UserRound size={16} />
-              <span>{m['hotel.nav.account']()}</span>
+              {session?.user?.email ? (
+                <span className="hotel-account-email">
+                  {session.user.email}
+                </span>
+              ) : (
+                <>
+                  <UserRound size={16} />
+                  <span>{m['hotel.nav.account']()}</span>
+                </>
+              )}
             </Link>
             <button
               className="hotel-menu"

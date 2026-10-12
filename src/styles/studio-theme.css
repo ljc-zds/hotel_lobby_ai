@@ -781,6 +781,13 @@
   white-space: nowrap;
   padding: 10px 12px;
 }
+.hotel-site .hotel-account .hotel-account-email {
+  display: block;
+  max-width: 170px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .hotel-site .hotel-credit-badge {
   color: var(--studio-blue);
   background: #edf1fb;
@@ -809,6 +816,21 @@
   }
 }
 @media (max-width: 700px) {
+  .hotel-site .hotel-account .hotel-account-email {
+    max-width: 80px;
+  }
+  .hotel-site .brand {
+    min-width: 0;
+  }
+  .hotel-site .brand > span:last-child {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .hotel-site .brand-mark-wrap {
+    flex-shrink: 0;
+  }
   .hotel-site .header-inner.container {
     width: calc(100% - 24px);
     gap: 8px;

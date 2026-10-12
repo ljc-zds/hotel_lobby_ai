@@ -14,6 +14,8 @@
 
 import { deLocalizeHref } from '@/paraglide/runtime.js';
 
+export const DEFAULT_POST_AUTH_PATH = '/#video-generator';
+
 // Never bounce back into an auth page — that loops.
 const AUTH_PATH_RE =
   /^\/(sign-in|sign-up|verify-email|forgot-password|reset-password|auth-callback)(\/|\?|#|$)/;
@@ -92,15 +94,18 @@ export function resolveAfterAuthUrl(params: {
   callbackUrl?: string | null;
   fallback?: string;
 }): string {
-  const { redirect, callbackUrl, fallback = '/settings' } = params;
+  const { redirect, callbackUrl, fallback = DEFAULT_POST_AUTH_PATH } = params;
   if (isAppProtocolUrl(redirect)) {
     // Scheme allow-listing happens on /auth-callback, which is the only place
     // that can hand out a token.
     return `/auth-callback?redirect=${encodeURIComponent(redirect as string)}`;
   }
-  return (
-    safeInternalPath(callbackUrl) || safeInternalPath(redirect) || fallback
-  );
+  const target =
+    safeInternalPath(callbackUrl) || safeInternalPath(redirect) || fallback;
+  // Account-home links used to send newly signed-in users into the dashboard.
+  // Keep specific destinations (billing, admin, etc.), but start normal users
+  // at the generator, including old /settings callback URLs.
+  return /^\/(?:zh\/)?settings\/?(?:[?#].*)?$/.test(target) ? fallback : target;
 }
 
 /**

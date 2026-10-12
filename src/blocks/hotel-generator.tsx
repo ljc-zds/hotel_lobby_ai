@@ -29,13 +29,6 @@ export function HotelGenerator({
   selected: HotelTrack;
   onGenerated: (track: HotelTrack, quality: string, videoUrl?: string) => void;
 }) {
-  const resolutions = [
-    {
-      quality: '768P',
-      credits: 0,
-      detail: 'MiniMax-H3 · 10s',
-    },
-  ];
   const id = useId();
   const [photos, setPhotos] = useState<[Photo | null, Photo | null]>([
     null,
@@ -48,7 +41,7 @@ export function HotelGenerator({
   const completed = useRef('');
   const creationTrack = useRef(selected);
   const [errors, setErrors] = useState<[string, string]>(['', '']);
-  const [quality, setQuality] = useState('768P');
+  const quality = '768P';
   const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState('');
@@ -380,40 +373,6 @@ export function HotelGenerator({
             </p>
           </div>
           <div className="studio-settings-pane">
-            <div className="studio-step-label">
-              <span>02</span>
-              <div>
-                <strong>{m['hotel.copy.choose_video_resolution_107']()}</strong>
-                <small>
-                  {m[
-                    'hotel.copy.compare_the_credits_for_each_resolution_108'
-                  ]()}
-                </small>
-              </div>
-            </div>
-            <div
-              className="resolution-grid"
-              role="group"
-              aria-label={m['hotel.copy.video_resolution_109']()}
-            >
-              {resolutions.map((item) => (
-                <button
-                  key={item.quality}
-                  type="button"
-                  className={quality === item.quality ? 'active' : ''}
-                  aria-pressed={quality === item.quality}
-                  disabled={busy}
-                  onClick={() => {
-                    setQuality(item.quality);
-                    setResult('');
-                  }}
-                >
-                  <strong>{item.quality}</strong>
-                  <span>{m['video.trial']()}</span>
-                  <small>{item.detail}</small>
-                </button>
-              ))}
-            </div>
             <label className="consent-row">
               <input
                 type="checkbox"

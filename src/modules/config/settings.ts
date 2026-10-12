@@ -88,6 +88,12 @@ export function getSettingGroups(): SettingGroup[] {
 
     // Payment
     {
+      name: 'waffo',
+      title: 'Waffo Pancake',
+      description: 'Production credit pack payments',
+      tab: 'payment',
+    },
+    {
       name: 'basic_payment',
       title: 'Basic',
       description: 'Payment general settings',
@@ -397,6 +403,7 @@ export function getSettings(): Setting[] {
       options: [
         { label: 'Stripe', value: 'stripe' },
         { label: 'Creem', value: 'creem' },
+        { label: 'Waffo Pancake', value: 'waffo' },
         { label: 'PayPal', value: 'paypal' },
         { label: 'Alipay', value: 'alipay' },
         { label: 'WeChat Pay', value: 'wechat' },
@@ -439,6 +446,54 @@ export function getSettings(): Setting[] {
     },
 
     // ─── Payment / Creem ─────────────────────────────────────────────
+    {
+      name: 'waffo_enabled',
+      title: 'Enable Waffo Pancake',
+      type: 'switch',
+      group: 'waffo',
+      tab: 'payment',
+    },
+    {
+      name: 'waffo_store_id',
+      title: 'Store ID',
+      type: 'text',
+      defaultValue: 'STO_1nm5A1mhdrl8P2HHBYj7hN',
+      group: 'waffo',
+      tab: 'payment',
+    },
+    {
+      name: 'waffo_merchant_id',
+      title: 'Merchant ID',
+      type: 'text',
+      placeholder: 'MER_xxx',
+      group: 'waffo',
+      tab: 'payment',
+    },
+    {
+      name: 'waffo_private_key',
+      title: 'Production RSA Private Key',
+      type: 'password',
+      group: 'waffo',
+      tab: 'payment',
+    },
+    {
+      name: 'waffo_webhook_public_key',
+      title: 'Production Webhook Public Key',
+      type: 'textarea',
+      group: 'waffo',
+      tab: 'payment',
+      tip: 'Raw webhook: https://YOUR_DOMAIN/api/payment/notify/waffo; subscribe to order.completed.',
+    },
+    {
+      name: 'waffo_product_ids_mapping',
+      title: 'Credit Pack Product IDs',
+      type: 'textarea',
+      placeholder:
+        '{"hotel_starter":"PROD_xxx","hotel_creator":"PROD_xxx","hotel_studio":"PROD_xxx"}',
+      group: 'waffo',
+      tab: 'payment',
+      tip: 'Publish one-time USD products: $9.90 / 50 credits, $19.90 / 105 credits, $29.90 / 160 credits. Product prices must match the website.',
+    },
     {
       name: 'creem_enabled',
       title: 'Enable Creem',

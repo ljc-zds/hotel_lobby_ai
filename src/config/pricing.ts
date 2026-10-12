@@ -34,6 +34,36 @@ export type PricingProduct = {
  * Keys MUST match what the pricing UI sends as product_id.
  */
 export const pricingCatalog: Record<string, PricingProduct> = {
+  hotel_starter: {
+    productId: 'hotel_starter',
+    productName: 'Starter Drop',
+    planName: 'Starter Drop',
+    description: '50 credits',
+    type: PaymentType.ONE_TIME,
+    priceInCents: 990,
+    currency: 'usd',
+    credits: 50,
+  },
+  hotel_creator: {
+    productId: 'hotel_creator',
+    productName: 'Creator Stack',
+    planName: 'Creator Stack',
+    description: '105 credits',
+    type: PaymentType.ONE_TIME,
+    priceInCents: 1990,
+    currency: 'usd',
+    credits: 105,
+  },
+  hotel_studio: {
+    productId: 'hotel_studio',
+    productName: 'Studio Vault',
+    planName: 'Studio Vault',
+    description: '160 credits',
+    type: PaymentType.ONE_TIME,
+    priceInCents: 2990,
+    currency: 'usd',
+    credits: 160,
+  },
   starter_monthly: {
     productId: 'starter_monthly',
     productName: 'Starter',

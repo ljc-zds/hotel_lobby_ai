@@ -852,7 +852,7 @@
   "hotel.nav.contact": "Contact",
   "hotel.nav.videos": "My videos",
   "hotel.nav.account": "Account",
-  "hotel.nav.credits": "Demo credits",
+  "hotel.nav.credits": "Credits",
   "common.sign.social_unavailable": "This sign-in method is not available yet. Please use email for now.",
   "common.sign.social_failed": "Unable to start social sign-in. Please try again.",
   "common.sign.social_redirecting": "Connecting…",
@@ -1045,5 +1045,9 @@
   "traffic.visitors": "Unique browsers (UV)",
   "traffic.pageviews": "Page views (PV)",
   "traffic.date": "Date",
-  "traffic.empty": "No visits recorded yet. Counts start after this feature goes live."
+  "traffic.empty": "No visits recorded yet. Counts start after this feature goes live.",
+  "hotel.payment.billing": "View billing and credits",
+  "hotel.payment.buy": "Buy credits",
+  "hotel.payment.unavailable": "Checkout is unavailable. Please try again.",
+  "hotel.payment.notice": "Credits are added to your account after payment is verified."
 }

@@ -16,6 +16,7 @@ import {
   type PaymentEvent,
   type PaymentOrder,
 } from '@/core/payment/types';
+import { WaffoProvider } from '@/core/payment/waffo';
 import { credit, order, subscription } from '@/config/db/schema';
 import { getAllConfigs } from '@/modules/config/service';
 import { calculateCreditExpirationTime } from '@/modules/credits/service';
@@ -52,14 +53,46 @@ async function getPaymentManager(): Promise<PaymentManager> {
     c('stripe_secret_key') || c('stripe_api_key'),
     c('creem_enabled'),
     c('creem_api_key'),
+    c('creem_environment'),
+    c('creem_signing_secret'),
     c('alipay_app_id'),
     c('wechat_mch_id'),
     c('default_payment_provider'),
+    ...[
+      'waffo_enabled',
+      'waffo_merchant_id',
+      'waffo_private_key',
+      'waffo_webhook_public_key',
+      'waffo_store_id',
+      'waffo_product_ids_mapping',
+    ].map(c),
   ]);
   if (manager && hash === managerConfigHash) return manager;
 
   manager = new PaymentManager();
   managerConfigHash = hash;
+  if (c('waffo_enabled') === 'true') {
+    if (
+      !c('waffo_merchant_id') ||
+      !c('waffo_private_key') ||
+      !c('waffo_webhook_public_key') ||
+      !c('waffo_store_id')
+    ) {
+      throw new Error(
+        'Complete Waffo production credentials in admin payment settings'
+      );
+    }
+    manager.addProvider(
+      new WaffoProvider({
+        merchantId: c('waffo_merchant_id'),
+        privateKey: c('waffo_private_key'),
+        webhookPublicKey: c('waffo_webhook_public_key'),
+        storeId: c('waffo_store_id'),
+        productMapping: c('waffo_product_ids_mapping'),
+      }),
+      c('default_payment_provider') === 'waffo'
+    );
+  }
 
   const stripeKey = c('stripe_secret_key') || c('stripe_api_key');
   if (stripeKey) {
@@ -289,16 +322,30 @@ async function handleCheckoutSuccess(session: any, provider: string) {
     result.out_trade_no ||
     result.outTradeNo ||
     '';
-  if (!sessionId) return;
+  if (!sessionId && provider !== 'waffo') return;
 
   // Find order by session ID
   const [existingOrder] = await db()
     .select()
     .from(order)
-    .where(and(eq(order.paymentSessionId, sessionId), isNull(order.deletedAt)))
+    .where(
+      and(
+        provider === 'waffo'
+          ? and(
+              eq(order.orderNo, result.waffoOrderNo),
+              eq(order.paymentProvider, 'waffo')
+            )
+          : eq(order.paymentSessionId, sessionId),
+        isNull(order.deletedAt)
+      )
+    )
     .limit(1);
 
-  if (!existingOrder) return;
+  if (!existingOrder) {
+    if (provider === 'waffo')
+      throw new Error('Waffo order not yet available; retry webhook');
+    return;
+  }
 
   // Idempotency: skip if already paid
   if (existingOrder.status === OrderStatus.PAID) return;
@@ -310,6 +357,14 @@ async function handleCheckoutSuccess(session: any, provider: string) {
 
   const paymentInfo = session.paymentInfo;
   const subscriptionInfo = session.subscriptionInfo;
+
+  if (
+    provider === 'waffo' &&
+    (paymentInfo?.paymentCurrency !== existingOrder.currency.toLowerCase() ||
+      (paymentInfo?.paymentAmount ?? 0) < existingOrder.amount)
+  ) {
+    throw new Error('Waffo payment does not match the order price or currency');
+  }
 
   if (session.paymentStatus === PaymentStatus.SUCCESS) {
     // Prepare order update
@@ -331,6 +386,20 @@ async function handleCheckoutSuccess(session: any, provider: string) {
 
     // Atomically update order + create subscription + grant credits
     await db().transaction(async (tx: any) => {
+      if (provider === 'waffo') {
+        // Claim inside the transaction: concurrent deliveries must grant once.
+        const claimed = await tx
+          .update(order)
+          .set(orderUpdate)
+          .where(
+            and(
+              eq(order.id, existingOrder.id),
+              eq(order.status, existingOrder.status)
+            )
+          )
+          .returning({ id: order.id });
+        if (claimed.length === 0) return;
+      }
       // 1. Create subscription if applicable
       if (subscriptionInfo && session.subscriptionId) {
         const subNo = getSnowId();

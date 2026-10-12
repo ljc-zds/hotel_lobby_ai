@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import type { HotelTrack } from '@/types/hotel';
 import {
   ArrowRight,
@@ -16,8 +17,9 @@ import {
 import { toast } from 'sonner';
 
 import { useSession } from '@/core/auth/client';
-import { Link } from '@/core/i18n/navigation';
+import { Link, useRouter } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
+import { apiGet, apiPost } from '@/lib/api-client';
 import { m } from '@/paraglide/messages.js';
 import { getLocale } from '@/paraglide/runtime.js';
 import { HotelGallery } from '@/blocks/hotel-gallery';
@@ -47,7 +49,26 @@ export function HotelSite({
   const [selected, setSelected] = useState(tracks[0]);
   const [menu, setMenu] = useState(false);
   const [orders, setOrders] = useState<DemoOrder[]>([]);
-  const [credits, setCredits] = useState(0);
+  const router = useRouter();
+  const balanceQuery = useQuery({
+    queryKey: ['hotel-credit-balance', session?.user?.id],
+    queryFn: () => apiGet<{ balance: number }>('/api/credits'),
+    enabled: !!session?.user,
+  });
+  const credits = session?.user ? (balanceQuery.data?.balance ?? 0) : 0;
+  const checkout = useMutation({
+    mutationFn: (productId: string) =>
+      apiPost<{ checkout_url: string }>('/api/payment/checkout', {
+        product_id: productId,
+        redirect:
+          getLocale() === 'zh' ? '/zh/settings/billing' : '/settings/billing',
+      }),
+    onSuccess: ({ checkout_url }) => {
+      if (!checkout_url) throw new Error(m['hotel.payment.unavailable']());
+      window.location.assign(checkout_url);
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
   useEffect(() => {
     try {
       const stored = JSON.parse(
@@ -71,7 +92,6 @@ export function HotelSite({
                 typeof x.date === 'string'
             )
         );
-      setCredits(Number(localStorage.getItem('hotel-demo-credits')) || 0);
     } catch {
       /* Ignore outdated demo data. */
     }
@@ -94,17 +114,12 @@ export function HotelSite({
       toast.info(m['hotel.copy.your_browser_could_not_save_the_001']());
     }
   }
-  function addCredits(amount: number) {
-    const next = credits + amount;
-    setCredits(next);
-    try {
-      localStorage.setItem('hotel-demo-credits', String(next));
-    } catch {
-      /* Demo still works without storage. */
+  function buyPack(productId: string) {
+    if (!session?.user) {
+      router.push('/sign-in?callbackUrl=%2Fpricing');
+      return;
     }
-    toast.success(
-      m['hotel.copy.added_demo_credits_no_payment_was_002']({ amount })
-    );
+    checkout.mutate(productId);
   }
   return (
     <div className="hotel-site">
@@ -422,15 +437,29 @@ export function HotelSite({
               </h1>
               <p>{m['hotel.copy.choose_a_credit_pack_for_your_051']()}</p>
               <div className="hotel-demo-notice">
-                {m['hotel.copy.template_demo_no_payment_demo_credits_052']()}
-                {credits}
+                {m['hotel.payment.notice']()}
               </div>
             </section>
             <section id="credit-packs" className="pack-grid container">
               {[
-                { name: 'Starter Drop', credits: 50, price: '9.90' },
-                { name: 'Creator Stack', credits: 105, price: '19.90' },
-                { name: 'Studio Vault', credits: 160, price: '29.90' },
+                {
+                  id: 'hotel_starter',
+                  name: 'Starter Drop',
+                  credits: 50,
+                  price: '9.90',
+                },
+                {
+                  id: 'hotel_creator',
+                  name: 'Creator Stack',
+                  credits: 105,
+                  price: '19.90',
+                },
+                {
+                  id: 'hotel_studio',
+                  name: 'Studio Vault',
+                  credits: 160,
+                  price: '29.90',
+                },
               ].map((pack, i) => (
                 <article
                   key={pack.name}
@@ -458,17 +487,20 @@ export function HotelSite({
                   </ul>
                   <button
                     className="primary-action"
-                    onClick={() => addCredits(pack.credits)}
+                    disabled={checkout.isPending}
+                    onClick={() => buyPack(pack.id)}
                   >
-                    {m['hotel.copy.try_demo_purchase_056']()}
+                    {checkout.isPending
+                      ? m['common.pricing.processing']()
+                      : m['hotel.payment.buy']()}
                     <ArrowRight size={16} />
                   </button>
                 </article>
               ))}
             </section>
             <section className="hotel-pricing-foot container">
-              <Link href="/orders" className="hero-secondary">
-                {m['hotel.copy.view_demo_credits_057']()}
+              <Link href="/settings/billing" className="hero-secondary">
+                {m['hotel.payment.billing']()}
                 <ArrowRight size={16} />
               </Link>
             </section>
@@ -481,7 +513,7 @@ export function HotelSite({
             <p>{m['hotel.copy.check_your_credits_and_creations_then_059']()}</p>
             <div className="hotel-orders-summary">
               <article>
-                <span>{m['hotel.copy.demo_credits_060']()}</span>
+                <span>{m['hotel.nav.credits']()}</span>
                 <strong>{credits}</strong>
                 <Link href="/pricing">
                   {m['hotel.copy.add_credits_061']()}

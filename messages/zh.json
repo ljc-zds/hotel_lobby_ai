@@ -852,7 +852,7 @@
   "hotel.nav.contact": "联系",
   "hotel.nav.videos": "我的视频",
   "hotel.nav.account": "账户",
-  "hotel.nav.credits": "演示积分",
+  "hotel.nav.credits": "积分",
   "common.sign.social_unavailable": "该登录方式暂未开通，请先使用邮箱登录。",
   "common.sign.social_failed": "无法发起第三方登录，请重试。",
   "common.sign.social_redirecting": "正在跳转…",
@@ -1045,5 +1045,9 @@
   "traffic.visitors": "独立浏览器（UV）",
   "traffic.pageviews": "页面访问量（PV）",
   "traffic.date": "日期",
-  "traffic.empty": "暂无访问记录，统计从本功能上线后开始。"
+  "traffic.empty": "暂无访问记录，统计从本功能上线后开始。",
+  "hotel.payment.billing": "查看账单和积分",
+  "hotel.payment.buy": "购买积分",
+  "hotel.payment.unavailable": "暂时无法结账，请稍后重试。",
+  "hotel.payment.notice": "付款验证成功后，积分会自动发放到你的账户。"
 }

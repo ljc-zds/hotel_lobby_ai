@@ -35,6 +35,8 @@ export const envConfigs: Record<string, string> = {
   auth_secret: procEnv.AUTH_SECRET ?? '',
 
   // Payment - Stripe
+  waffo_private_key: procEnv.WAFFO_PRIVATE_KEY ?? '',
+  waffo_webhook_public_key: procEnv.WAFFO_WEBHOOK_PUBLIC_KEY ?? '',
   stripe_secret_key: procEnv.STRIPE_SECRET_KEY ?? '',
   stripe_publishable_key: procEnv.STRIPE_PUBLISHABLE_KEY ?? '',
   stripe_signing_secret: procEnv.STRIPE_SIGNING_SECRET ?? '',

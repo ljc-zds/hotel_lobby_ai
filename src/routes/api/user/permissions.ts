@@ -8,12 +8,12 @@ async function GET({ request }: { request: Request }) {
   try {
     const auth = getAuth();
     const session = await auth.api.getSession({ headers: request.headers });
-    if (!session?.user) return respErr('Unauthorized');
+    if (!session?.user) return respErr('Unauthorized', { status: 401 });
 
-    const isAdmin = await hasPermission(session.user.id, 'admin.*');
-    return respData({ isAdmin });
-  } catch (error: any) {
-    return respErr(error.message || 'Internal error');
+    const isAdmin = await hasPermission(session.user.id, 'admin.access');
+    return respData({ isAdmin }, { headers: { 'Cache-Control': 'no-store' } });
+  } catch {
+    return respErr('Unable to check permissions', { status: 503 });
   }
 }
 

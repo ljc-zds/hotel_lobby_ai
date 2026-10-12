@@ -12,6 +12,7 @@ import {
 
 import { envConfigs } from '@/config';
 import { m } from '@/paraglide/messages.js';
+import { useUserPermissions } from '@/hooks/use-user-permissions';
 import { SupportWidget } from '@/blocks/support-widget';
 import { AppLayout } from '@/components/app-layout';
 
@@ -20,6 +21,7 @@ export const Route = createFileRoute('/settings')({
 });
 
 function SettingsLayout() {
+  const { data: permissions } = useUserPermissions();
   const group = m['common.systems.settings']();
   const navItems = [
     {
@@ -61,6 +63,15 @@ function SettingsLayout() {
   ];
 
   const footerNavItems = [
+    ...(permissions?.isAdmin
+      ? [
+          {
+            href: '/admin/traffic',
+            label: m['traffic.title'](),
+            icon: LayoutDashboard,
+          },
+        ]
+      : []),
     {
       href: '/settings/profile',
       label: m['settings.nav.profile'](),

@@ -24,7 +24,7 @@ Generate with `NODE_ENV=production pnpm exec drizzle-kit generate --config=drizz
 
 ## Product status
 
-The generator uses MiniMax-H3 (768P, 10 seconds). Waffo Pancake is integrated for checkout and payment webhooks. Provider credentials are configured separately from the source code.
+The generator uses MiniMax-H3 (768P, 15 seconds). Waffo Pancake is integrated for checkout and payment webhooks. Provider credentials are configured separately from the source code.
 
 ## Video archival to private R2
 

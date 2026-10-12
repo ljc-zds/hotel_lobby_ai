@@ -199,7 +199,7 @@ export function HotelSite({
                       'HOTEL LOBBY AI',
                       '2 PHOTOS',
                       '16:9 MP4',
-                      'MiniMax-H3 · 768P · 10s',
+                      'MiniMax-H3 · 768P · 15s',
                     ].map((x) => (
                       <span key={x}>{x}</span>
                     ))}

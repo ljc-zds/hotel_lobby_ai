@@ -81,7 +81,7 @@ export async function reserveVideoCredits(
     credits: -VIDEO_CREDIT_COST,
     remainingCredits: 0,
     status: 'active',
-    description: 'MiniMax-H3 10-second video',
+    description: 'MiniMax-H3 15-second video',
     consumedDetail: JSON.stringify(consumed),
     metadata: JSON.stringify({ taskId }),
   });

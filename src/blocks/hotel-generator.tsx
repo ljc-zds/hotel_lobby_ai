@@ -413,7 +413,7 @@ export function HotelGenerator({
               </div>
               <div>
                 <span>{m['video.duration']()}</span>
-                <strong>10s</strong>
+                <strong>15s</strong>
               </div>
               <div>
                 <span>{m['video.cost_label']()}</span>

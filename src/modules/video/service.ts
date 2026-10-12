@@ -32,7 +32,7 @@ export async function startVideo(
       costCredits: VIDEO_CREDIT_COST,
       creditId,
       scene: track.id,
-      options: JSON.stringify({ resolution: '768P', duration: 10 }),
+      options: JSON.stringify({ resolution: '768P', duration: 15 }),
     });
   });
   try {
@@ -43,7 +43,7 @@ export async function startVideo(
         prompt,
         options: {
           resolution: '768P',
-          duration: 10,
+          duration: 15,
           image_urls: images,
           callback_url: videoCallbackUrl(id),
         },

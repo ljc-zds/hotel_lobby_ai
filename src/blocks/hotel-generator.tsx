@@ -262,7 +262,7 @@ export function HotelGenerator({
             </p>
           </div>
           <div className="selected-template-mini">
-            <img src={selected.image} alt="" />
+            <img src={selected.image} alt="" width={1280} height={720} />
             <div>
               <span>{m['hotel.copy.selected_template_094']()}</span>
               <strong>{selected.title}</strong>

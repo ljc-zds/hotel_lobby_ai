@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 import { useSession } from '@/core/auth/client';
 import { Link, useRouter } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
+import { hotelPacks } from '@/config/hotel-packs';
 import { apiGet, apiPost } from '@/lib/api-client';
 import { m } from '@/paraglide/messages.js';
 import { getLocale } from '@/paraglide/runtime.js';
@@ -393,7 +394,7 @@ export function HotelSite({
         {page === 'pricing' && (
           <>
             <section className="hotel-page-intro container">
-              <div className="eyebrow">CREDIT PACKS</div>
+              <div className="eyebrow">{m['hotel.pricing.heading']()}</div>
               <h1>
                 {m['hotel.copy.your_next_drop_049']()}
                 <br />
@@ -405,36 +406,38 @@ export function HotelSite({
               </div>
             </section>
             <section id="credit-packs" className="pack-grid container">
-              {[
-                {
-                  id: 'hotel_starter',
-                  name: 'Starter Drop',
-                  credits: 50,
-                  price: '9.90',
-                },
-                {
-                  id: 'hotel_creator',
-                  name: 'Creator Stack',
-                  credits: 105,
-                  price: '19.90',
-                },
-                {
-                  id: 'hotel_studio',
-                  name: 'Studio Vault',
-                  credits: 160,
-                  price: '29.90',
-                },
-              ].map((pack, i) => (
+              {hotelPacks.map((pack, i) => (
                 <article
-                  key={pack.name}
-                  className={`pack-card ${i === 1 ? 'featured' : ''}`}
+                  key={pack.id}
+                  className={`pack-card ${i === 2 ? 'featured' : ''}`}
                 >
                   <div>
-                    <span>{i === 1 ? 'MOST POPULAR' : `PACK 0${i + 1}`}</span>
-                    <h2>${pack.price}</h2>
-                    <p>{pack.credits} CREDITS</p>
+                    <span>
+                      {i === 2
+                        ? m['hotel.pricing.popular']()
+                        : m['hotel.pricing.pack_number']({ number: i + 1 })}
+                    </span>
+                    <h2>${(pack.priceInCents / 100).toFixed(2)}</h2>
+                    <p>{m['hotel.pricing.videos']({ count: pack.videos })}</p>
                   </div>
-                  <h3>{pack.name}</h3>
+                  <h3>
+                    {
+                      [
+                        m['hotel.pricing.single'](),
+                        m['hotel.pricing.starter'](),
+                        m['hotel.pricing.creator'](),
+                        m['hotel.pricing.bulk'](),
+                      ][i]
+                    }
+                  </h3>
+                  <p>
+                    {m['hotel.pricing.average']({
+                      price: (pack.priceInCents / 100 / pack.videos).toFixed(2),
+                    })}
+                  </p>
+                  <p>
+                    {m['hotel.generator.credit_count']({ count: pack.credits })}
+                  </p>
                   <ul>
                     <li>
                       <Check />
@@ -447,6 +450,10 @@ export function HotelSite({
                     <li>
                       <Check />
                       {m['hotel.copy.15second_landscape_video_055']()}
+                    </li>
+                    <li>
+                      <Check />
+                      {m['hotel.pricing.unlimited']()}
                     </li>
                   </ul>
                   <button

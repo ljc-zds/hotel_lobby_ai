@@ -489,10 +489,10 @@ export function getSettings(): Setting[] {
       title: 'Credit Pack Product IDs',
       type: 'textarea',
       placeholder:
-        '{"hotel_starter":"PROD_xxx","hotel_creator":"PROD_xxx","hotel_studio":"PROD_xxx"}',
+        '{"hotel_single":"PROD_xxx","hotel_starter":"PROD_xxx","hotel_creator":"PROD_xxx","hotel_studio":"PROD_xxx"}',
       group: 'waffo',
       tab: 'payment',
-      tip: 'Publish one-time USD products: $9.90 / 50 credits, $19.90 / 105 credits, $29.90 / 160 credits. Product prices must match the website.',
+      tip: 'Publish one-time USD products: $4.99 / 50 credits, $9.90 / 100 credits, $19.90 / 250 credits, $29.90 / 450 credits. Product prices must match the website.',
     },
     {
       name: 'creem_enabled',

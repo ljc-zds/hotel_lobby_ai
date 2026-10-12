@@ -906,7 +906,7 @@
   "hotel.copy.start_creating_048": "Start creating",
   "hotel.copy.your_next_drop_049": "Your next drop.",
   "hotel.copy.starts_here_050": "Starts here.",
-  "hotel.copy.choose_a_credit_pack_for_your_051": "Choose a credit pack for your next creation.",
+  "hotel.copy.choose_a_credit_pack_for_your_051": "Choose 1, 2, 5 or 9 videos. Each video is 15 seconds at 768P and costs 50 credits.",
   "hotel.copy.template_demo_no_payment_demo_credits_052": "Paid generation · 50 credits per video",
   "hotel.copy.480p_720p_or_1080p_053": "Current generation: 768P",
   "hotel.copy.14_scene_templates_054": "7 motion templates",
@@ -1056,5 +1056,15 @@
   "video.cost_label": "Generation cost",
   "video.cost": "{credits} credits",
   "video.insufficient_credits": "You need 50 purchased credits to generate a video.",
-  "video.buy_credits": "Buy credits"
+  "video.buy_credits": "Buy credits",
+  "hotel.pricing.single": "Single Trial",
+  "hotel.pricing.starter": "Starter Pack",
+  "hotel.pricing.creator": "Creator Pack",
+  "hotel.pricing.bulk": "Bulk Pack",
+  "hotel.pricing.popular": "MOST POPULAR",
+  "hotel.pricing.pack_number": "PACK {number}",
+  "hotel.pricing.videos": "{count} video(s)",
+  "hotel.pricing.average": "${price} per video",
+  "hotel.pricing.heading": "VIDEO PACKS",
+  "hotel.pricing.unlimited": "No daily generation limit"
 }

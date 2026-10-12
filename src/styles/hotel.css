@@ -1121,7 +1121,7 @@ p {
   line-height: 1.7;
 }
 .pack-grid {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
   padding-bottom: 54px;
   display: grid;
@@ -1157,7 +1157,7 @@ p {
 .pack-card h2 {
   margin: 22px 0 0;
   font:
-    400 62px/1 Anton,
+    400 clamp(38px, 4vw, 62px)/1 Anton,
     sans-serif;
 }
 .pack-card > div > p {
@@ -1874,6 +1874,9 @@ p {
   }
 }
 @media (max-width: 980px) {
+  .pack-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .desktop-nav {
     display: none;
   }

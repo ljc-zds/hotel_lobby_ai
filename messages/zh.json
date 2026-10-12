@@ -906,7 +906,7 @@
   "hotel.copy.start_creating_048": "开始创作",
   "hotel.copy.your_next_drop_049": "你的下一次发布。",
   "hotel.copy.starts_here_050": "从这里开始。",
-  "hotel.copy.choose_a_credit_pack_for_your_051": "一次购买，按次创作。选择适合你的点数包。",
+  "hotel.copy.choose_a_credit_pack_for_your_051": "选择 1、2、5 或 9 条视频套餐。每条 15 秒、768P，消耗 50 积分。",
   "hotel.copy.template_demo_no_payment_demo_credits_052": "付费生成 · 每条 50 积分",
   "hotel.copy.480p_720p_or_1080p_053": "当前真实生成：768P",
   "hotel.copy.14_scene_templates_054": "7 个动态场景模板",
@@ -1056,5 +1056,15 @@
   "video.cost_label": "生成费用",
   "video.cost": "{credits} 积分",
   "video.insufficient_credits": "生成视频需要至少 50 购买积分。",
-  "video.buy_credits": "购买积分"
+  "video.buy_credits": "购买积分",
+  "hotel.pricing.single": "单条体验",
+  "hotel.pricing.starter": "入门包",
+  "hotel.pricing.creator": "创作者包",
+  "hotel.pricing.bulk": "批量包",
+  "hotel.pricing.popular": "热门套餐",
+  "hotel.pricing.pack_number": "套餐 {number}",
+  "hotel.pricing.videos": "{count} 条视频",
+  "hotel.pricing.average": "平均每条 ${price}",
+  "hotel.pricing.heading": "视频套餐",
+  "hotel.pricing.unlimited": "付费生成，每天不限次数"
 }

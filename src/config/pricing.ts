@@ -10,6 +10,8 @@
 
 import { PaymentInterval, PaymentType } from '@/core/payment/types';
 
+import { hotelPacks } from './hotel-packs';
+
 export type PricingPlanInfo = {
   name: string;
   interval: PaymentInterval;
@@ -34,36 +36,21 @@ export type PricingProduct = {
  * Keys MUST match what the pricing UI sends as product_id.
  */
 export const pricingCatalog: Record<string, PricingProduct> = {
-  hotel_starter: {
-    productId: 'hotel_starter',
-    productName: 'Starter Drop',
-    planName: 'Starter Drop',
-    description: '50 credits',
-    type: PaymentType.ONE_TIME,
-    priceInCents: 990,
-    currency: 'usd',
-    credits: 50,
-  },
-  hotel_creator: {
-    productId: 'hotel_creator',
-    productName: 'Creator Stack',
-    planName: 'Creator Stack',
-    description: '105 credits',
-    type: PaymentType.ONE_TIME,
-    priceInCents: 1990,
-    currency: 'usd',
-    credits: 105,
-  },
-  hotel_studio: {
-    productId: 'hotel_studio',
-    productName: 'Studio Vault',
-    planName: 'Studio Vault',
-    description: '160 credits',
-    type: PaymentType.ONE_TIME,
-    priceInCents: 2990,
-    currency: 'usd',
-    credits: 160,
-  },
+  ...Object.fromEntries(
+    hotelPacks.map((pack) => [
+      pack.id,
+      {
+        productId: pack.id,
+        productName: pack.name,
+        planName: pack.name,
+        description: `${pack.videos} video${pack.videos === 1 ? '' : 's'} / ${pack.credits} credits. Each video: 15 seconds, 768P. No daily generation limit.`,
+        type: PaymentType.ONE_TIME,
+        priceInCents: pack.priceInCents,
+        currency: 'usd',
+        credits: pack.credits,
+      },
+    ])
+  ),
   starter_monthly: {
     productId: 'starter_monthly',
     productName: 'Starter',

@@ -72,7 +72,7 @@ export class MiniMaxProvider implements AIProvider {
     const resolution = options.resolution || '768P';
     const resolutions =
       model === 'MiniMax-H3' ? ['768P', '2K'] : ['480P', '768P'];
-    const duration = options.duration ?? (model === 'MiniMax-H3' ? 4 : 5);
+    const duration = options.duration ?? (model === 'MiniMax-H3' ? 10 : 5);
     if (
       !resolutions.includes(resolution) ||
       !Number.isInteger(duration) ||

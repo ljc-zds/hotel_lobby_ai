@@ -46,7 +46,7 @@ export async function startVideo(
       status: 'pending',
       costCredits: 0,
       scene: track.id,
-      options: JSON.stringify({ resolution: '768P', duration: 4 }),
+      options: JSON.stringify({ resolution: '768P', duration: 10 }),
     });
   });
   try {
@@ -57,7 +57,7 @@ export async function startVideo(
         prompt,
         options: {
           resolution: '768P',
-          duration: 4,
+          duration: 10,
           image_urls: images,
           callback_url: videoCallbackUrl(id),
         },

@@ -33,7 +33,7 @@ export function HotelGenerator({
     {
       quality: '768P',
       credits: 0,
-      detail: 'MiniMax-H3 · 4s',
+      detail: 'MiniMax-H3 · 10s',
     },
   ];
   const id = useId();
@@ -435,7 +435,7 @@ export function HotelGenerator({
               </div>
               <div>
                 <span>{m['video.duration']()}</span>
-                <strong>4s</strong>
+                <strong>10s</strong>
               </div>
               <small>
                 {m['hotel.copy.the_demo_does_not_spend_credits_114']()}

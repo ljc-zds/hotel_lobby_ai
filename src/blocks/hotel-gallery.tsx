@@ -125,6 +125,9 @@ export function HotelGallery({
         <Volume2 size={16} aria-hidden="true" />
         {m['hotel.copy.preview_and_choose_your_duos_performance_123']()}
       </p>
+      <p className="template-preview-disclosure">
+        {m['hotel.seo.preview_disclosure']()}
+      </p>
       <div className="template-grid">
         {items
           .filter((track) => category === 'all' || track.category === category)

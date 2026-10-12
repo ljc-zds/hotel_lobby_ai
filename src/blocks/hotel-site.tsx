@@ -99,7 +99,13 @@ export function HotelSite({
             aria-label={m['hotel.copy.home_004']()}
           >
             <span className="brand-mark-wrap">
-              <img className="brand-mark" src="/logo.svg?v=2" alt="" />
+              <img
+                className="brand-mark"
+                src="/logo.svg?v=2"
+                alt=""
+                width={40}
+                height={40}
+              />
             </span>
             <span>
               {envConfigs.app_name.replace(/\.ai$/, '')}
@@ -174,13 +180,14 @@ export function HotelSite({
                   <div className="eyebrow">
                     {m['hotel.copy.hotel_lobby_ai_rap_video_generator_008']()}
                   </div>
-                  <h1 className="hero-title-exact">
-                    {m['hotel.copy.your_duo_009']()}
+                  <h1 className="hero-title-exact hotel-seo-title">
+                    {m['hotel.seo.h1_brand']()}
                     <br />
-                    <span>{m['hotel.copy.your_verse_010']()}</span>
-                    <br />
-                    {m['hotel.copy.one_drop_011']()}
+                    <span>{m['hotel.seo.h1_tool']()}</span>
                   </h1>
+                  <p className="hotel-hero-tagline">
+                    {m['hotel.seo.tagline']()}
+                  </p>
                   <p>
                     {m[
                       'hotel.copy.preview_15second_landscape_music_templates_and_012'
@@ -226,6 +233,8 @@ export function HotelSite({
                           'hotel.copy.two_performers_singing_around_a_suspended_016'
                         ]()}
                         fetchPriority="high"
+                        width={1280}
+                        height={720}
                       />
                     </a>
                     <div className="hero-card-footer">
@@ -345,6 +354,18 @@ export function HotelSite({
               <h2>{m['hotel.copy.questions_before_you_create_037']()}</h2>
               <div className="hotel-faq">
                 {[
+                  {
+                    q: m['hotel.seo.free_question'](),
+                    a: m['hotel.seo.free_answer'](),
+                  },
+                  {
+                    q: m['hotel.seo.preview_question'](),
+                    a: m['hotel.seo.preview_answer'](),
+                  },
+                  {
+                    q: m['hotel.seo.failure_question'](),
+                    a: m['hotel.seo.failure_answer'](),
+                  },
                   {
                     q: m['hotel.copy.what_photos_should_i_use_038'](),
                     a: m['hotel.copy.use_an_original_jpg_png_or_039'](),
@@ -512,6 +533,8 @@ export function HotelSite({
                 {orders.map((o) => (
                   <article key={o.id}>
                     <img
+                      width={1280}
+                      height={720}
                       src={
                         tracks.find((t) => t.id === o.scene)?.image ||
                         tracks[0].image
@@ -580,6 +603,8 @@ export function HotelSite({
             <p>{m['hotel.copy.hotel_lobby_ai_is_a_twosubject_072']()}</p>
             <img
               src={tracks[0].image}
+              width={1280}
+              height={720}
               alt={m['hotel.copy.orange_studio_with_two_performers_073']()}
             />
             <h2>{m['hotel.copy.get_your_photos_stageready_074']()}</h2>

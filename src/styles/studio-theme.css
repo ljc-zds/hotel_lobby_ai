@@ -84,6 +84,20 @@
   color: var(--studio-blue);
   -webkit-text-stroke: 0;
 }
+.hotel-site .hero-title-exact.hotel-seo-title {
+  font-size: clamp(36px, 4vw, 64px);
+  overflow-wrap: break-word;
+}
+.hotel-site .hero-copy .hotel-hero-tagline {
+  font-weight: 600;
+  color: var(--studio-blue);
+}
+.hotel-site .template-preview-disclosure {
+  margin-bottom: 24px;
+  color: var(--studio-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
 .hotel-site .hero-copy p {
   color: var(--studio-muted);
   font-size: 16px;

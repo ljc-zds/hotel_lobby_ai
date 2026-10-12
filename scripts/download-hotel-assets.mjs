@@ -17,6 +17,19 @@ const urls = [
   'https://hotellobby.ai/assets/templates/corgi-rooftop-poster-v3.webp',
   'https://hotellobby.ai/assets/brand/hotellobby-mark-clean.webp',
   'https://hotellobby.ai/assets/templates/orange-street-duo-v6.mp4',
+  'https://hotellobby.ai/assets/templates/orange-formal-duo-v2.mp4',
+  'https://hotellobby.ai/assets/templates/orange-retro-duo-v2.mp4',
+  'https://hotellobby.ai/assets/templates/orange-cats-v2.mp4',
+  'https://hotellobby.ai/assets/templates/orange-fox-panda-v2.mp4',
+  'https://hotellobby.ai/assets/templates/orange-corgis-v2.mp4',
+  'https://hotellobby.ai/assets/templates/marble-checkin-v2.mp4',
+  'https://hotellobby.ai/assets/templates/neon-elevator-v2.mp4',
+  'https://hotellobby.ai/assets/templates/moon-gate-v2.mp4',
+  'https://hotellobby.ai/assets/templates/wedding-lounge-v2.mp4',
+  'https://hotellobby.ai/assets/templates/gold-atrium-v2.mp4',
+  'https://hotellobby.ai/assets/templates/fox-panda-v2.mp4',
+  'https://hotellobby.ai/assets/templates/cat-jazz-v2.mp4',
+  'https://hotellobby.ai/assets/templates/corgi-rooftop-v2.mp4',
 ];
 for (let i = 0; i < urls.length; i += 4)
   await Promise.all(

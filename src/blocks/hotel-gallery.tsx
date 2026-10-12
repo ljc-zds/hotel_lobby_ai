@@ -215,37 +215,21 @@ export function HotelGallery({
                 <X size={20} />
               </button>
               <div className="landscape-player">
-                {preview.id === 'orange-street-duo' ? (
-                  <video
-                    src="/reference/orange-street-duo-v6.mp4"
-                    poster={preview.image}
-                    controls
-                    playsInline
-                    preload="metadata"
-                  />
-                ) : (
-                  <img
-                    src={preview.image}
-                    alt={preview.title}
-                    width={1280}
-                    height={720}
-                  />
-                )}
+                <video
+                  key={preview.id}
+                  src={preview.video}
+                  poster={preview.image}
+                  controls
+                  playsInline
+                  autoPlay
+                  preload="metadata"
+                />
               </div>
               <div className="template-modal-copy">
                 <div>
-                  <small>
-                    {preview.id === 'orange-street-duo'
-                      ? 'VIDEO PREVIEW'
-                      : 'TEMPLATE POSTER'}
-                  </small>
+                  <small>{m['hotel.copy.preview_125']()}</small>
                   <h3 id={previewHeadingId}>{preview.title}</h3>
                   <p>{preview.description}</p>
-                  {preview.id !== 'orange-street-duo' && (
-                    <p>
-                      {m['hotel.copy.video_preview_is_not_available_for_131']()}
-                    </p>
-                  )}
                 </div>
                 <button
                   className="hero-primary"

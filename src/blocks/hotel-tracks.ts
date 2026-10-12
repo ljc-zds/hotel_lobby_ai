@@ -16,6 +16,7 @@ export function getHotelTracks(locale?: 'en' | 'zh'): HotelTrack[] {
       ),
       category: 'people',
       image: '/reference/orange-street-duo-poster-v7.webp',
+      video: '/reference/orange-street-duo-v6.mp4',
     },
     {
       id: 'orange-formal-duo',
@@ -28,6 +29,7 @@ export function getHotelTracks(locale?: 'en' | 'zh'): HotelTrack[] {
       ]({}, locale ? { locale } : undefined),
       category: 'people',
       image: '/reference/orange-formal-duo-poster-v3.webp',
+      video: '/reference/orange-formal-duo-v2.mp4',
     },
     {
       id: 'orange-retro-duo',
@@ -41,6 +43,7 @@ export function getHotelTracks(locale?: 'en' | 'zh'): HotelTrack[] {
       ),
       category: 'people',
       image: '/reference/orange-retro-duo-poster-v3.webp',
+      video: '/reference/orange-retro-duo-v2.mp4',
     },
     {
       id: 'orange-cats',
@@ -54,6 +57,7 @@ export function getHotelTracks(locale?: 'en' | 'zh'): HotelTrack[] {
       ),
       category: 'animals',
       image: '/reference/orange-cats-poster-v3.webp',
+      video: '/reference/orange-cats-v2.mp4',
     },
     {
       id: 'orange-fox-panda',
@@ -67,6 +71,7 @@ export function getHotelTracks(locale?: 'en' | 'zh'): HotelTrack[] {
       ),
       category: 'animals',
       image: '/reference/orange-fox-panda-poster-v3.webp',
+      video: '/reference/orange-fox-panda-v2.mp4',
     },
     {
       id: 'orange-corgis',
@@ -80,6 +85,7 @@ export function getHotelTracks(locale?: 'en' | 'zh'): HotelTrack[] {
       ),
       category: 'animals',
       image: '/reference/orange-corgis-poster-v3.webp',
+      video: '/reference/orange-corgis-v2.mp4',
     },
     {
       id: 'marble-checkin',
@@ -92,6 +98,7 @@ export function getHotelTracks(locale?: 'en' | 'zh'): HotelTrack[] {
       ]({}, locale ? { locale } : undefined),
       category: 'people',
       image: '/reference/marble-checkin-poster-v3.webp',
+      video: '/reference/marble-checkin-v2.mp4',
     },
     {
       id: 'neon-elevator',
@@ -105,6 +112,7 @@ export function getHotelTracks(locale?: 'en' | 'zh'): HotelTrack[] {
       ),
       category: 'people',
       image: '/reference/neon-elevator-poster-v3.webp',
+      video: '/reference/neon-elevator-v2.mp4',
     },
     {
       id: 'moon-gate',
@@ -117,6 +125,7 @@ export function getHotelTracks(locale?: 'en' | 'zh'): HotelTrack[] {
       ]({}, locale ? { locale } : undefined),
       category: 'culture',
       image: '/reference/moon-gate-poster-v3.webp',
+      video: '/reference/moon-gate-v2.mp4',
     },
     {
       id: 'wedding-lounge',
@@ -129,6 +138,7 @@ export function getHotelTracks(locale?: 'en' | 'zh'): HotelTrack[] {
       ]({}, locale ? { locale } : undefined),
       category: 'people',
       image: '/reference/wedding-lounge-poster-v3.webp',
+      video: '/reference/wedding-lounge-v2.mp4',
     },
     {
       id: 'gold-atrium',
@@ -141,6 +151,7 @@ export function getHotelTracks(locale?: 'en' | 'zh'): HotelTrack[] {
       ]({}, locale ? { locale } : undefined),
       category: 'culture',
       image: '/reference/gold-atrium-poster-v3.webp',
+      video: '/reference/gold-atrium-v2.mp4',
     },
     {
       id: 'fox-panda',
@@ -154,6 +165,7 @@ export function getHotelTracks(locale?: 'en' | 'zh'): HotelTrack[] {
       ),
       category: 'animals',
       image: '/reference/fox-panda-poster-v3.webp',
+      video: '/reference/fox-panda-v2.mp4',
     },
     {
       id: 'cat-jazz',
@@ -167,6 +179,7 @@ export function getHotelTracks(locale?: 'en' | 'zh'): HotelTrack[] {
       ),
       category: 'animals',
       image: '/reference/cat-jazz-poster-v3.webp',
+      video: '/reference/cat-jazz-v2.mp4',
     },
     {
       id: 'corgi-rooftop',
@@ -180,6 +193,7 @@ export function getHotelTracks(locale?: 'en' | 'zh'): HotelTrack[] {
       ),
       category: 'animals',
       image: '/reference/corgi-rooftop-poster-v3.webp',
+      video: '/reference/corgi-rooftop-v2.mp4',
     },
   ];
 }

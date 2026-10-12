@@ -4,4 +4,5 @@ export interface HotelTrack {
   description: string;
   category: string;
   image: string;
+  video: string;
 }

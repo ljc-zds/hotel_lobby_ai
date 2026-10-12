@@ -153,7 +153,10 @@ function SignUpPage() {
           )}&callbackUrl=${encodeURIComponent(afterLoginUrl)}`;
           void authClient.sendVerificationEmail({
             email: value.email,
-            callbackURL: localizeHref(afterLoginUrl),
+            callbackURL: new URL(
+              localizeHref(afterLoginUrl),
+              window.location.origin
+            ).href,
           });
           router.push(verifyPath);
         } else {
@@ -181,7 +184,11 @@ function SignUpPage() {
     try {
       const result = await signIn.social({
         provider,
-        callbackURL: localizeHref(afterLoginUrl),
+        // Better Auth rejects fragments in relative callback URLs.
+        callbackURL: new URL(
+          localizeHref(afterLoginUrl),
+          window.location.origin
+        ).href,
       });
       if (result.error) setError(m['common.sign.social_failed']());
     } catch {

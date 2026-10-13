@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq, notLike } from 'drizzle-orm';
 
 import { db } from '@/core/db';
 import { envConfigs } from '@/config';
@@ -28,7 +28,15 @@ export async function getDbConfigs(): Promise<ConfigMap> {
       return {};
     }
 
-    const rows = await db().select().from(config);
+    const rows = await db()
+      .select()
+      .from(config)
+      .where(
+        and(
+          notLike(config.name, 'conversion:%'),
+          notLike(config.name, 'traffic:%')
+        )
+      );
     const result: ConfigMap = {};
     for (const row of rows) {
       if (!row.name || row.value === null || row.value === undefined) continue;

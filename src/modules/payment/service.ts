@@ -28,6 +28,7 @@ import {
   type NewSubscription,
   type UpdateSubscription,
 } from '@/modules/subscriptions/service';
+import { queueConversion } from '@/lib/conversion-events';
 import { getSnowId, getUniSeq, getUuid } from '@/lib/hash';
 
 // --- Order types ---
@@ -466,6 +467,14 @@ async function handleCheckoutSuccess(session: any, provider: string) {
         });
       }
 
+      // Persist an anonymous success event atomically with fulfillment.
+      await queueConversion(
+        tx,
+        existingOrder.userId,
+        'payment_success',
+        existingOrder.id
+      );
+
       // 3. Update order
       await tx
         .update(order)
@@ -571,6 +580,13 @@ export async function handleSubscriptionRenewal(
       paymentUserName: paymentInfo?.paymentUserName,
       paymentUserId: paymentInfo?.paymentUserId,
     });
+
+    await queueConversion(
+      tx,
+      existingSub.userId,
+      'payment_success',
+      renewalOrderNo
+    );
 
     // 3. Grant credits for renewal
     if (existingSub.creditsAmount && existingSub.creditsAmount > 0) {

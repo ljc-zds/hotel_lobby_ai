@@ -72,6 +72,25 @@ export async function trafficReport() {
       ...(JSON.parse(row.value || '{}') as Daily),
     }))
     .sort((a: any, b: any) => a.date.localeCompare(b.date));
+  const conversionRows = await db()
+    .select({ value: config.value })
+    .from(config)
+    .where(like(config.name, 'conversion:%'));
+  const conversionEvents = conversionRows.map(
+    (r: { value: string | null }) =>
+      JSON.parse(r.value || '{}') as { name: string; createdAt: string }
+  );
+  const funnel = (count: number) => {
+    const start = dateKey(Date.now() - (count - 1) * 86400_000);
+    const events = conversionEvents.filter(
+      (e) => dateKey(Date.parse(e.createdAt)) >= start
+    );
+    return {
+      signups: events.filter((e) => e.name === 'sign_up').length,
+      videos: events.filter((e) => e.name === 'start_video').length,
+      payments: events.filter((e) => e.name === 'payment_success').length,
+    };
+  };
   const summary = (count: number) => {
     const selected = days.filter(
       (d: any) => d.date >= dateKey(Date.now() - (count - 1) * 86400_000)
@@ -82,6 +101,7 @@ export async function trafficReport() {
     };
   };
   return {
+    funnel: { today: funnel(1), week: funnel(7), month: funnel(30) },
     today: summary(1),
     week: summary(7),
     month: summary(30),

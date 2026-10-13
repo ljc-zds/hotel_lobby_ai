@@ -12,6 +12,7 @@ import * as schema from '@/config/db/schema';
 import { getAllConfigs } from '@/modules/config/service';
 import { grantForNewUser } from '@/modules/credits/service';
 import { grantRoleForNewUser } from '@/modules/rbac/service';
+import { queueConversion } from '@/lib/conversion-events';
 import {
   getClientIpFromCtx,
   getCookieFromCtx,
@@ -271,6 +272,16 @@ export function getAuth(configs?: Record<string, string>) {
             };
           },
           after: async (createdUser: any) => {
+            try {
+              await queueConversion(
+                db(),
+                createdUser.id,
+                'sign_up',
+                createdUser.id
+              );
+            } catch {
+              console.warn('[analytics] signup event could not be queued');
+            }
             // Onboarding side effects. Read configs fresh: authInstance is
             // cached, so the `configs` captured at build time can be stale
             // after an admin settings save.

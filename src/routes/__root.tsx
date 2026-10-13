@@ -16,6 +16,7 @@ import { envConfigs } from '@/config';
 import { getQueryClient } from '@/lib/query-client';
 import { getLocale, locales, localizeUrl } from '@/paraglide/runtime.js';
 import { Ads } from '@/components/analytics/ads';
+import { ConversionTracker } from '@/components/analytics/conversion-tracker';
 import { GoogleAnalytics } from '@/components/analytics/google-analytics';
 import { Plausible } from '@/components/analytics/plausible';
 import { VisitTracker } from '@/components/analytics/visit-tracker';
@@ -126,7 +127,10 @@ function RootComponent() {
         <Toaster position="top-center" richColors />
         <GoogleOneTap />
         {analytics?.gaId ? (
-          <GoogleAnalytics measurementId={analytics.gaId} />
+          <>
+            <GoogleAnalytics measurementId={analytics.gaId} />
+            <ConversionTracker measurementId={analytics.gaId} />
+          </>
         ) : null}
         {analytics?.plausibleDomain || analytics?.plausibleSrc ? (
           <Plausible

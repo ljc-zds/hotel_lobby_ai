@@ -4,7 +4,9 @@ import { createFileRoute } from '@tanstack/react-router';
 import { apiGet } from '@/lib/api-client';
 import { m } from '@/paraglide/messages.js';
 
+type Funnel = { signups: number; videos: number; payments: number };
 type Report = {
+  funnel: { today: Funnel; week: Funnel; month: Funnel };
   today: { pv: number; uv: number };
   week: { pv: number; uv: number };
   month: { pv: number; uv: number };
@@ -54,6 +56,44 @@ function TrafficPage() {
               </article>
             ))}
           </div>
+          <section className="space-y-3">
+            <h2 className="text-xl font-semibold">
+              {m['traffic.funnel_title']()}
+            </h2>
+            <p className="text-muted-foreground">
+              {m['traffic.funnel_description']()}
+            </p>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr>
+                    <th>{m['traffic.period']()}</th>
+                    <th>{m['traffic.signups']()}</th>
+                    <th>{m['traffic.videos']()}</th>
+                    <th>{m['traffic.payments']()}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(['today', 'week', 'month'] as const).map((period, i) => (
+                    <tr key={period} className="border-t">
+                      <td className="py-3">
+                        {
+                          [
+                            m['traffic.today'](),
+                            m['traffic.week'](),
+                            m['traffic.month'](),
+                          ][i]
+                        }
+                      </td>
+                      <td>{query.data?.funnel?.[period].signups ?? 0}</td>
+                      <td>{query.data?.funnel?.[period].videos ?? 0}</td>
+                      <td>{query.data?.funnel?.[period].payments ?? 0}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>

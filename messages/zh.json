@@ -1074,5 +1074,11 @@
   "hotel.seo.failure_question": "生成失败怎么办？",
   "hotel.seo.failure_answer": "如果生成失败或被取消，本次预扣的 50 积分会退还。可在“我的视频”中查看任务状态。",
   "hotel.seo.preview_disclosure": "以下为表演风格参考预览，并非本站生成效果示例；你的 AI 生成结果可能不同。",
-  "video.retry_balance": "重新查询积分"
+  "video.retry_balance": "重新查询积分",
+  "traffic.funnel_title": "转化次数",
+  "traffic.funnel_description": "仅记录本次更新后由服务端确认的成功事件，不补记历史数据。",
+  "traffic.period": "时间范围",
+  "traffic.signups": "注册成功",
+  "traffic.videos": "开始生成",
+  "traffic.payments": "支付成功"
 }

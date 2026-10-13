@@ -4,9 +4,11 @@ import { z } from 'zod';
 import { MiniMaxApiError } from '@/core/ai';
 import { getAuth } from '@/core/auth';
 import { InsufficientVideoCredits } from '@/core/credits/video';
+import { db } from '@/core/db';
 import { VideoStorageError } from '@/core/storage/video';
 import { envConfigs } from '@/config';
 import { listVideos, queryVideo, startVideo } from '@/modules/video/service';
+import { queueConversion } from '@/lib/conversion-events';
 import { enforceMinIntervalRateLimit } from '@/lib/rate-limit';
 import { respData, respErr } from '@/lib/resp';
 import { getHotelTracks } from '@/blocks/hotel-tracks';
@@ -50,10 +52,13 @@ async function POST({ request }: { request: Request }) {
     if (!track) return respErr('Unknown template.', { status: 400 });
     if (!process.env.MINIMAX_API_KEY)
       return respErr('Video generation is not configured.', { status: 503 });
-    return respData(
-      await startVideo(session.user.id, track, body.images),
-      noStore
-    );
+    const task = await startVideo(session.user.id, track, body.images);
+    try {
+      await queueConversion(db(), session.user.id, 'start_video', task.id);
+    } catch {
+      console.warn('[analytics] video event could not be queued');
+    }
+    return respData(task, noStore);
   } catch (error) {
     if (error instanceof VideoStorageError)
       return respErr(error.message, { status: 503 });

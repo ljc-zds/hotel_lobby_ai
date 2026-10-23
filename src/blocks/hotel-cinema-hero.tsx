@@ -100,8 +100,8 @@ export function HotelCinemaHero({ track }: { track: HotelTrack }) {
             {m['hotel.copy.make_a_video_013']()}
             <ArrowRight size={18} />
           </a>
-          <a href="#templates" className="cinema-secondary">
-            {m['hotel.copy.browse_templates_014']()}
+          <a href="#actual-example" className="cinema-secondary">
+            {m['hotel.proof.hero_cta']()}
           </a>
         </div>
       </div>

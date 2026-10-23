@@ -21,6 +21,7 @@ import { videoGenerationAction } from '@/lib/video-generation-action';
 import { m } from '@/paraglide/messages.js';
 
 import '@/styles/raindance-generator.css';
+import '@/styles/hotel-trust.css';
 
 interface Photo {
   url: string;
@@ -482,6 +483,24 @@ export function HotelGenerator({
           <p className="rd-generator-privacy">
             <ShieldCheck size={16} aria-hidden="true" />
             {m['hotel.copy.local_preview_only_photos_are_not_106']()}
+          </p>
+          <p className="generator-provider-note">
+            {m['hotel.trust.provider_notice']()}{' '}
+            <a
+              href="https://platform.minimax.cn/protocol/privacy-policy"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {m['hotel.trust.provider_privacy']()}
+            </a>
+            {' / '}
+            <a
+              href="https://platform.minimax.cn/protocol/user-agreement"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {m['hotel.trust.provider_terms']()}
+            </a>
           </p>
           <label className="rd-generator-consent">
             <input

@@ -1,0 +1,36 @@
+{
+  "exampleId": "duo-first-run",
+  "createdAt": "2026-10-23T09:13:39.753Z",
+  "generationAttempts": 1,
+  "model": "MiniMax-H3",
+  "resolution": "768P",
+  "requestedDurationSeconds": 15,
+  "aspectRatio": "16:9",
+  "templateId": "orange-street-duo",
+  "prompt": "Create a family-safe music performance video with both subjects from reference image 1 and reference image 2 together. Preserve their identities. Scene: A plain orange studio, a suspended microphone and an original streetwear duo performance.. Natural movement, no violence, nudity, sexual content, hateful content or deceptive impersonation. No text or logos.",
+  "inputs": [
+    {
+      "path": "input-1.png",
+      "sha256": "3e33f1ed7170718058d7e3aea15cf42acce593c82b19ae85306cd03fff553435",
+      "source": "AI-generated fictional adult, OpenAI imagegen"
+    },
+    {
+      "path": "input-2.png",
+      "sha256": "c072672b6a22c08d3de0b449aceb7ed0312fe670e1a11d0f0edbe3227165d9ef",
+      "source": "AI-generated fictional adult, OpenAI imagegen"
+    }
+  ],
+  "execution": "Operator demonstration using the same MiniMaxProvider adapter and preset prompt as the website. It does not test the browser checkout, credit, or private-storage delivery flow.",
+  "editing": "Original provider MP4 downloaded and published byte-for-byte; no trimming, retouching, speed changes, or added audio. Poster frame extracted separately for display.",
+  "status": "success",
+  "firstObservedSuccessAt": "2026-10-23T09:19:22.486Z",
+  "output": {
+    "path": "output-original.mp4",
+    "sha256": "deb51ac781e8107c29b1602d2dd7aaa7bbb037293a4187f6b75e8bfec63cde52",
+    "width": 1344,
+    "height": 768,
+    "durationSeconds": 15.083333,
+    "bytes": 4464431,
+    "hasAudio": true
+  }
+}

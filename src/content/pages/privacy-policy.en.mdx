@@ -1,7 +1,7 @@
 export const meta = {
   title: 'Privacy Policy',
   description: 'How we collect, use, and protect your personal information.',
-  updated_at: '2026-10-12',
+  updated_at: '2026-10-23',
 };
 
 ## Introduction
@@ -23,6 +23,16 @@ We collect the following types of information to provide and improve our service
 Photos remain in browser memory during preview. When you confirm authorization and submit a generation request, the browser resizes the two photos and sends them through our authenticated server to MiniMax's Video V2 API using MiniMax-H3. Please do not upload sensitive or unauthorized images. Our application does not save the original input photos to its database or object storage. MiniMax processes the submitted references under its own privacy policy and service terms; we do not promise that its processing, retention or training practices match ours.
 
 We store account-linked task identifiers, scene, model, status, timestamps, preset prompt and result links to provide generation status and resolve support requests. Completed videos are copied from the provider to private Cloudflare R2 storage. Playback links require sign-in and are checked against the owning account. Browser storage may retain the active task identifier to resume status checks; your video library is linked to your account. Contact us to request deletion of account-linked task records; legal and abuse-prevention obligations may require retaining limited records.
+
+### Provider location, retention and further reading
+
+Our current integration calls `api.minimax.cn`, MiniMax’s mainland-China endpoint. The provider’s [Open Platform Privacy Policy (Chinese)](https://platform.minimax.cn/protocol/privacy-policy) identifies 上海稀宇科技有限公司 as operator. Section 4 describes mainland-China storage for personal information collected in its mainland operations and purpose-based retention, with legal exceptions; it does not give one fixed deletion period for every submitted reference photo. For visitors elsewhere, using this endpoint involves sending the submitted references to a provider operating in mainland China.
+
+Read the provider’s [Open Platform Service Terms (Chinese)](https://platform.minimax.cn/protocol/user-agreement) together with that policy. We have not obtained a separate zero-retention or no-training / no-model-improvement commitment for this integration. Do not assume either guarantee. The provider’s terms and policy may change; links were checked on October 23, 2026.
+
+Removing an account-linked record from HotelLobby does not itself delete a copy held by MiniMax. For a provider-side data request, contact us with the task ID so we can seek assistance, or use the contact channel in MiniMax’s own policy. Do not attach sensitive photos to support email. We cannot guarantee deletion from provider systems or backups on a particular date.
+
+Public operator demonstrations use explicitly labeled AI-generated fictional people and are separately authorized for publication. This does not make ordinary account photos or creations public.
 
 ## Visitor Statistics
 

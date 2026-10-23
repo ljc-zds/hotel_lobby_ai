@@ -20,12 +20,15 @@ import { useSession } from '@/core/auth/client';
 import { Link, useRouter } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
 import { hotelPacks } from '@/config/hotel-packs';
+import { publicVideoExample } from '@/config/public-example';
 import { apiGet, apiPost } from '@/lib/api-client';
 import { m } from '@/paraglide/messages.js';
 import { getLocale } from '@/paraglide/runtime.js';
+import { HotelActualExample } from '@/blocks/hotel-actual-example';
 import { HotelCinemaHero } from '@/blocks/hotel-cinema-hero';
 import { HotelGallery } from '@/blocks/hotel-gallery';
 import { HotelGenerator } from '@/blocks/hotel-generator';
+import { HotelPurchaseNotes } from '@/blocks/hotel-purchase-notes';
 import { getHotelTracks } from '@/blocks/hotel-tracks';
 import { LocaleSelector } from '@/components/locale-selector';
 
@@ -182,12 +185,19 @@ export function HotelSite({
         {page === 'content' && children}
         {page === 'home' && (
           <>
-            <HotelCinemaHero track={tracks[0]} />
+            <HotelCinemaHero
+              track={{
+                ...tracks[0],
+                image: publicVideoExample.poster,
+                video: publicVideoExample.video,
+              }}
+            />
             <div className="cinema-generator-intro container">
               <h2>{m['hotel.cinema.generator_title']()}</h2>
               <p>{m['hotel.cinema.generator_description']()}</p>
             </div>
             <HotelGenerator selected={selected} onGenerated={generated} />
+            <HotelActualExample />
             <section className="how-section container" id="how-it-works">
               <div className="eyebrow">{m['hotel.redesign.workflow']()}</div>
               <h2>{m['hotel.redesign.how']()}</h2>
@@ -461,6 +471,7 @@ export function HotelSite({
                 </article>
               ))}
             </section>
+            <HotelPurchaseNotes />
             <section className="hotel-pricing-foot container">
               <Link href="/settings/billing" className="hero-secondary">
                 {m['hotel.payment.billing']()}

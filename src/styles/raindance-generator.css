@@ -308,7 +308,7 @@
 .hotel-site .rd-generator-privacy {
   display: flex;
   gap: 8px;
-  color: #fffaf2;
+  color: #655b50;
   font-size: 12px;
   line-height: 1.5;
   margin: 0;
@@ -371,7 +371,7 @@
   margin: 0;
   font-size: 11px;
   line-height: 1.5;
-  color: #f9f7f3;
+  color: #655b50;
   text-align: center;
 }
 .hotel-site .rd-generator-foot a {
@@ -382,7 +382,7 @@
 }
 .hotel-site .rd-generator-status {
   margin: 0;
-  color: #f9f7f3;
+  color: #655b50;
   font-size: 13px;
   font-weight: 700;
   line-height: 1.5;

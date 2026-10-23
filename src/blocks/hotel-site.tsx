@@ -23,13 +23,16 @@ import { hotelPacks } from '@/config/hotel-packs';
 import { apiGet, apiPost } from '@/lib/api-client';
 import { m } from '@/paraglide/messages.js';
 import { getLocale } from '@/paraglide/runtime.js';
+import { HotelCinemaHero } from '@/blocks/hotel-cinema-hero';
 import { HotelGallery } from '@/blocks/hotel-gallery';
 import { HotelGenerator } from '@/blocks/hotel-generator';
 import { getHotelTracks } from '@/blocks/hotel-tracks';
 import { LocaleSelector } from '@/components/locale-selector';
 
 import '@/styles/hotel.css';
-import '@/styles/studio-theme.css';
+import '@/styles/raindance-theme.css';
+
+import { BuiltWithShipAny } from '@/components/built-with-shipany';
 
 type VideoOrder = {
   id: string;
@@ -88,9 +91,6 @@ export function HotelSite({
   }
   return (
     <div className="hotel-site">
-      <div className="announcement-bar">
-        {m['hotel.copy.hotel_lobby_ai_14_music_templates_003']()}
-      </div>
       <header className="site-header">
         <div className="header-inner container">
           <Link
@@ -182,100 +182,15 @@ export function HotelSite({
         {page === 'content' && children}
         {page === 'home' && (
           <>
-            <section className="hero-section">
-              <div className="hero-grid-lines" />
-              <div className="hero-grid container">
-                <div className="hero-copy">
-                  <div className="eyebrow">
-                    {m['hotel.copy.hotel_lobby_ai_rap_video_generator_008']()}
-                  </div>
-                  <h1 className="hero-title-exact hotel-seo-title">
-                    {m['hotel.seo.h1_brand']()}
-                    <br />
-                    <span>{m['hotel.seo.h1_tool']()}</span>
-                  </h1>
-                  <p className="hotel-hero-tagline">
-                    {m['hotel.seo.tagline']()}
-                  </p>
-                  <p>
-                    {m[
-                      'hotel.copy.preview_15second_landscape_music_templates_and_012'
-                    ]()}
-                  </p>
-                  <div className="hero-actions">
-                    <a href="#video-generator" className="hero-primary">
-                      {m['hotel.copy.make_a_video_013']()}
-                      <ArrowRight size={18} />
-                    </a>
-                    <a href="#templates" className="hero-secondary">
-                      {m['hotel.copy.browse_templates_014']()}
-                    </a>
-                  </div>
-                  <div className="hero-facts">
-                    {[
-                      'HOTEL LOBBY AI',
-                      '2 PHOTOS',
-                      '16:9 MP4',
-                      'MiniMax-H3 · 768P · 15s',
-                    ].map((x) => (
-                      <span key={x}>{x}</span>
-                    ))}
-                  </div>
-                </div>
-                <div className="hero-visual">
-                  <div className="hero-tape-label">
-                    HOTEL LOBBY AI · TRACK 01
-                  </div>
-                  <div className="hero-room-card">
-                    <div className="eyebrow hotel-room-label">
-                      ORANGE STUDIO · CENTER MIC
-                    </div>
-                    <a
-                      href="#templates"
-                      aria-label={m[
-                        'hotel.copy.browse_the_orange_street_duo_template_015'
-                      ]()}
-                    >
-                      <img
-                        src={tracks[0].image}
-                        alt={m[
-                          'hotel.copy.two_performers_singing_around_a_suspended_016'
-                        ]()}
-                        fetchPriority="high"
-                        width={1280}
-                        height={720}
-                      />
-                    </a>
-                    <div className="hero-card-footer">
-                      <span>Orange Street Duo</span>
-                      <b>
-                        <Mic size={12} /> SOUND PREVIEW
-                      </b>
-                    </div>
-                  </div>
-                  <a
-                    className="hotel-sticker"
-                    href="#templates"
-                    aria-label={m['hotel.copy.browse_music_templates_017']()}
-                  >
-                    HOTEL
-                    <br />
-                    LOBBY AI
-                    <br />
-                    VIDEO
-                  </a>
-                </div>
-              </div>
-            </section>
+            <HotelCinemaHero track={tracks[0]} />
+            <div className="cinema-generator-intro container">
+              <h2>{m['hotel.cinema.generator_title']()}</h2>
+              <p>{m['hotel.cinema.generator_description']()}</p>
+            </div>
             <HotelGenerator selected={selected} onGenerated={generated} />
-            <HotelGallery selected={selected} onSelect={setSelected} />
-            <section className="how-section container">
-              <div className="eyebrow">HOTEL LOBBY AI WORKFLOW</div>
-              <h2>
-                {m['hotel.copy.three_steps_to_your_018']()}
-                <br />
-                {m['hotel.copy.hotel_lobby_ai_video_019']()}
-              </h2>
+            <section className="how-section container" id="how-it-works">
+              <div className="eyebrow">{m['hotel.redesign.workflow']()}</div>
+              <h2>{m['hotel.redesign.how']()}</h2>
               <div className="steps-grid">
                 {[
                   {
@@ -306,17 +221,27 @@ export function HotelSite({
                 ))}
               </div>
             </section>
+            <HotelGallery selected={selected} onSelect={setSelected} />
             <section className="trend-section">
               <div className="trend-grid container">
-                <div>
-                  <div className="eyebrow">HOTEL LOBBY AI FORMAT</div>
-                  <h2>
-                    {m['hotel.copy.a_twosubject_026']()}
-                    <br />
-                    <span>{m['hotel.copy.rap_video_format_027']()}</span>
-                  </h2>
+                <div className="rain-trend-media">
+                  <video
+                    src={tracks[0].video}
+                    poster={tracks[0].image}
+                    controls
+                    playsInline
+                    preload="none"
+                  />
+                  <div>
+                    {m['hotel.redesign.example']()}
+                    <span>{tracks[0].title}</span>
+                  </div>
                 </div>
                 <div className="trend-copy">
+                  <div className="eyebrow">
+                    {m['hotel.redesign.trend_label']()}
+                  </div>
+                  <h2>{m['hotel.redesign.trend_heading']()}</h2>
                   <p>
                     {m[
                       'hotel.copy.two_subjects_one_suspended_microphone_a_028'
@@ -334,7 +259,9 @@ export function HotelSite({
             </section>
             <section className="photo-guide container">
               <div>
-                <div className="eyebrow">HOTEL LOBBY AI PHOTO GUIDE</div>
+                <div className="eyebrow">
+                  {m['hotel.redesign.photo_guide']()}
+                </div>
                 <h2>
                   {m['hotel.copy.better_photos_031']()}
                   <br />
@@ -358,8 +285,47 @@ export function HotelSite({
                 ))}
               </div>
             </section>
+            <section className="rain-pricing container">
+              <div className="eyebrow">{m['hotel.nav.pricing']()}</div>
+              <h2>{m['hotel.redesign.pricing_heading']()}</h2>
+              <p>{m['hotel.redesign.pricing_description']()}</p>
+              <div className="rain-pricing-grid">
+                {[hotelPacks[0], hotelPacks[2]].map((pack, i) => (
+                  <article key={pack.id}>
+                    <span className="rain-sticker">
+                      {i === 0
+                        ? m['hotel.redesign.single_label']()
+                        : m['hotel.redesign.creator_label']()}
+                    </span>
+                    <h3>
+                      {i === 0
+                        ? m['hotel.redesign.single_title']()
+                        : m['hotel.redesign.creator_title']()}
+                    </h3>
+                    <strong className="rain-price">
+                      ${(pack.priceInCents / 100).toFixed(2)}
+                    </strong>
+                    <p>
+                      {i === 0
+                        ? m['hotel.redesign.single_copy']()
+                        : m['hotel.redesign.creator_copy']()}
+                    </p>
+                    <span>
+                      {m['hotel.pricing.videos']({ count: pack.videos })} /{' '}
+                      {m['hotel.generator.credit_count']({
+                        count: pack.credits,
+                      })}
+                    </span>
+                  </article>
+                ))}
+              </div>
+              <Link className="hero-secondary" href="/pricing">
+                {m['hotel.redesign.pricing_link']()}
+                <ArrowRight size={16} />
+              </Link>
+            </section>
             <section className="faq-section container">
-              <div className="eyebrow">HOTEL LOBBY AI FAQ</div>
+              <div className="eyebrow">{m['hotel.redesign.faq_label']()}</div>
               <h2>{m['hotel.copy.questions_before_you_create_037']()}</h2>
               <div className="hotel-faq">
                 {[
@@ -406,12 +372,8 @@ export function HotelSite({
             <section className="final-cta">
               <div className="container">
                 <div>
-                  <div className="eyebrow">HOTEL LOBBY AI GENERATOR</div>
-                  <h2>
-                    {m['hotel.copy.let_your_duo_046']()}
-                    <br />
-                    {m['hotel.copy.take_the_spotlight_047']()}
-                  </h2>
+                  <h2>{m['hotel.redesign.final_heading']()}</h2>
+                  <p>{m['hotel.redesign.final_description']()}</p>
                 </div>
                 <a className="hero-secondary" href="#video-generator">
                   {m['hotel.copy.start_creating_048']()}
@@ -647,8 +609,12 @@ export function HotelSite({
             <Link href="/blog">{m['hotel.nav.blog']()}</Link>
             <Link href="/about">{m['hotel.nav.about']()}</Link>
             <Link href="/contact">{m['hotel.nav.contact']()}</Link>
-            <Link href="/privacy-policy">Privacy</Link>
-            <Link href="/terms-of-service">Terms</Link>
+            <Link href="/privacy-policy">
+              {m['hotel.redesign.legal_privacy']()}
+            </Link>
+            <Link href="/terms-of-service">
+              {m['hotel.redesign.legal_terms']()}
+            </Link>
           </div>
           <div className="footer-contact">
             <Link href="/contact">
@@ -668,6 +634,7 @@ export function HotelSite({
             © 2026 {envConfigs.app_name}
             {m['hotel.copy.template_demo_084']()}
           </span>
+          <BuiltWithShipAny />
         </div>
       </footer>
     </div>

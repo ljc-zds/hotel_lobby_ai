@@ -1,0 +1,15 @@
+# Private development files must not be uploaded with source deployments.
+.env
+.env.*
+!.env.example
+.git
+.claude
+.agents
+.codex
+.cursor
+data
+docs/design-references
+*.db
+*.sqlite
+*.sqlite3
+*.pem

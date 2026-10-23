@@ -3,9 +3,11 @@ import type { HotelTrack } from '@/types/hotel';
 import { ArrowRight, Check, Play, Volume2, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 
-import { envConfigs } from '@/config';
+import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages.js';
 import { getHotelTracks } from '@/blocks/hotel-tracks';
+
+import '@/styles/raindance-gallery.css';
 
 interface HotelGalleryProps {
   selected: HotelTrack;
@@ -21,7 +23,7 @@ export function HotelGallery({
   items = getHotelTracks(),
 }: HotelGalleryProps) {
   const categories = [
-    { id: 'all', label: m['hotel.copy.all_templates_118']() },
+    { id: 'all', label: m['hotel.cinema.all_templates']() },
     { id: 'people', label: m['hotel.copy.person_101']() },
     { id: 'culture', label: m['hotel.copy.culture_119']() },
     { id: 'animals', label: m['hotel.copy.animals_120']() },
@@ -89,13 +91,8 @@ export function HotelGallery({
     >
       <div className="section-heading-row">
         <div>
-          <span className="eyebrow">02 · PICK A TRACK</span>
-          <h2 id={headingId}>
-            {title ??
-              m['hotel.copy.choose_a_template_121']({
-                app: envConfigs.app_name,
-              })}
-          </h2>
+          <span className="eyebrow">{m['hotel.nav.templates']()}</span>
+          <h2 id={headingId}>{title ?? m['hotel.cinema.gallery_title']()}</h2>
         </div>
         <div
           className="filter-row"
@@ -112,7 +109,7 @@ export function HotelGallery({
               <button
                 key={item.id}
                 type="button"
-                className={`filter${category === item.id ? 'active' : ''}`}
+                className={cn('filter', { active: category === item.id })}
                 aria-pressed={category === item.id}
                 onClick={() => setCategory(item.id)}
               >
@@ -123,7 +120,7 @@ export function HotelGallery({
       </div>
       <p className="template-audio-note">
         <Volume2 size={16} aria-hidden="true" />
-        {m['hotel.copy.preview_and_choose_your_duos_performance_123']()}
+        {m['hotel.cinema.gallery_intro']()}
       </p>
       <p className="template-preview-disclosure">
         {m['hotel.seo.preview_disclosure']()}
@@ -134,7 +131,9 @@ export function HotelGallery({
           .map((track) => (
             <article
               key={track.id}
-              className={`template-card${selected.id === track.id ? 'selected' : ''}`}
+              className={cn('template-card', {
+                selected: selected.id === track.id,
+              })}
             >
               <div className="template-media">
                 <button
@@ -155,9 +154,6 @@ export function HotelGallery({
                     width={640}
                     height={360}
                   />
-                  <span className="room-number">
-                    TRACK {String(items.indexOf(track) + 1).padStart(2, '0')}
-                  </span>
                   <span className="preview-chip">
                     <Play size={10} aria-hidden="true" />
                     {m['hotel.copy.preview_125']()}
@@ -166,12 +162,6 @@ export function HotelGallery({
                     <Play size={20} fill="currentColor" aria-hidden="true" />
                   </span>
                 </button>
-                {selected.id === track.id && (
-                  <span className="selected-chip">
-                    <Check size={11} aria-hidden="true" />
-                    {m['hotel.copy.selected_126']()}
-                  </span>
-                )}
                 <button
                   type="button"
                   className="template-create-cta"
@@ -190,6 +180,12 @@ export function HotelGallery({
                 onClick={() => choose(track)}
                 aria-pressed={selected.id === track.id}
               >
+                {selected.id === track.id && (
+                  <span className="selected-chip">
+                    <Check size={11} aria-hidden="true" />
+                    {m['hotel.copy.selected_126']()}
+                  </span>
+                )}
                 <strong>{track.title}</strong>
                 <span>{track.description}</span>
                 <small>

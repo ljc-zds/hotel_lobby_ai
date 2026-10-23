@@ -25,10 +25,6 @@ import { GoogleOneTap } from '@/components/google-one-tap';
 import { SandboxPreviewBridge } from '@/components/sandbox-preview-bridge';
 import { Toaster } from '@/components/ui/sonner';
 
-import '@fontsource-variable/space-grotesk';
-import '@fontsource/ibm-plex-sans/400.css';
-import '@fontsource/ibm-plex-sans/500.css';
-import '@fontsource/ibm-plex-sans/600.css';
 import '@/styles/globals.css';
 
 // Analytics IDs live in the DB config (1h-cached service). Fetched via a

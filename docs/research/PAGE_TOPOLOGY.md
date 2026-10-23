@@ -1,2 +1,15 @@
-Reference: https://hotellobby.ai/zh. Extracted body #08090b, foreground #f4f1e8, accent #c8ff32, cyan #53d8ff, coral #ff6b5e. Fonts Space Grotesk / Noto Sans SC; Anton headings; Space Mono labels. Exact reference CSS extracted in src/styles/hotel.css. Container min(1180px,100% - 40px), section padding 104px, phone 72px. Use existing matching CSS classes.
-Header → grid hero → generator →14-track gallery →workflow →lime explainer →photo guide →FAQ →coral CTA →footer. Orders route observed signed-out 登录查看积分. Template adds clearly marked local demo history. Pricing packs50/$9.90,105/$19.90,160/$29.90. No production generation/payment integration requested.
+# RainDance reference redesign
+
+Reference: https://airaindance.com/#make (2026-10-23). Keep HotelLobby brand, routes, paid generation, OAuth, credits, analytics and existing consent wording.
+Direction: playful editorial / soft brutalism. Variance 6, motion 2, density 5. One light theme. Exact reference fonts Fraunces 800 / Bricolage Grotesque 400,600,700, self-hosted.
+Colors: sand #fff4e6 (oklch .97 .022 75), ink #161a24 (.218 .021 268), sun #ffd23f (.879 .162 91), amber #ff7a5c (.75 .17 35), sea #1d5c8c (.45 .10 246), card #fffaf3.
+
+1. Sticky transparent cream header -> blurred cream with border on scroll, 68px.
+2. Centered headline, yellow rotated sticker, Fraunces 72px, warm red accent.
+3. Blue gradient generator 1120px wide, 2px ink border, 28px radius, 6px offset shadow. Two upload cards on left, output video on right. Real 768P / 15s / 50-credit data, no free-preview fiction.
+4. Three bordered workflow cards, rounded hard shadows.
+5. Template gallery retained for real 14-template selection, reference card treatments.
+6. Trend explanation with video at left and text at right.
+7. Two pricing overview cards with real pricing, FAQ rounded accordion cards.
+8. Blue final CTA panel, cream footer, existing legal links.
+   Breakpoints: >=1024 generator left/right; <1024 output after photos then settings. 390px hero36px, 2 upload columns, 12px panel padding.

@@ -1,0 +1,418 @@
+/* Berd-inspired color stages, with the actual selectable product templates. */
+.hotel-site .template-section {
+  width: min(1120px, calc(100% - 32px));
+  max-width: 1120px;
+  margin: 80px auto;
+  padding: 0;
+  color: #26251f;
+  font-family: 'Bricolage Grotesque', 'Noto Sans SC', sans-serif;
+}
+.hotel-site .template-section .section-heading-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+.hotel-site .template-section .eyebrow {
+  color: #827267;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+.hotel-site .template-section h2 {
+  font:
+    600 clamp(32px, 4vw, 50px)/1.12 'Bricolage Grotesque',
+    'Noto Sans SC',
+    sans-serif;
+  margin: 10px 0 0;
+  letter-spacing: -0.045em;
+  color: #26251f;
+  text-transform: none;
+}
+.hotel-site .template-section .filter-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.hotel-site .template-section .filter {
+  border: 1px solid #d6d2ca;
+  border-radius: 999px;
+  min-height: 40px;
+  padding: 9px 18px;
+  background: transparent;
+  color: #6a6760;
+  font:
+    500 13px/1.3 'Bricolage Grotesque',
+    sans-serif;
+  text-transform: none;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.hotel-site .template-section .filter:hover {
+  color: #26251f;
+  background: #e9e5df;
+}
+.hotel-site .template-section .filter.active {
+  background: #26251f;
+  color: #fff;
+  border-color: #26251f;
+}
+.hotel-site .template-section .template-audio-note {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: #6a6760;
+  font:
+    400 15px/1.6 'Bricolage Grotesque',
+    sans-serif;
+  margin: 0 0 8px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.hotel-site .template-section .template-audio-note svg {
+  display: none;
+}
+.hotel-site .template-section .template-preview-disclosure {
+  color: #716e67;
+  font-size: 12px;
+  line-height: 1.6;
+  max-width: 700px;
+  margin: 0 0 28px;
+}
+.hotel-site .template-section .template-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+.hotel-site .template-section .template-card {
+  --stage: #e8e2ee;
+  background: var(--stage);
+  border: 1px solid transparent;
+  border-radius: 22px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: none;
+  transition:
+    transform 0.25s,
+    border-color 0.25s;
+  min-width: 0;
+}
+.hotel-site .template-section .template-card:nth-child(4n + 2) {
+  --stage: #e3ebca;
+}
+.hotel-site .template-section .template-card:nth-child(4n + 3) {
+  --stage: #f0dfcc;
+}
+.hotel-site .template-section .template-card:nth-child(4n + 4) {
+  --stage: #dce5e7;
+}
+.hotel-site .template-section .template-card.selected {
+  box-shadow: none;
+  border-color: #8b8378;
+}
+.hotel-site .template-section .template-card:hover {
+  border-color: #a69d90;
+  transform: translateY(-3px);
+  box-shadow: none;
+}
+.hotel-site .template-section .template-card:first-child {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  align-items: center;
+}
+.hotel-site .template-section .template-media {
+  position: relative;
+  aspect-ratio: auto;
+  padding: 38px 34px 12px;
+  border: 0;
+  background: transparent;
+  min-width: 0;
+}
+.hotel-site .template-section .template-preview-target {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16/9;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 30px #33273a1a;
+  transition: transform 0.3s;
+}
+.hotel-site .template-section .template-preview-target:hover {
+  transform: scale(1.018);
+}
+.hotel-site .template-section .template-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  transform: none;
+}
+.hotel-site .template-section .template-card:hover img {
+  transform: none;
+}
+.hotel-site .template-section .preview-chip,
+.hotel-site .template-section .room-number,
+.hotel-site .template-section .template-create-cta {
+  display: none;
+}
+.hotel-site .template-section .landscape-play {
+  width: 48px;
+  height: 48px;
+  background: #fffef5e8;
+  color: #26251f;
+  border: 0;
+  box-shadow: none;
+}
+.hotel-site .template-section .template-copy {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  width: 100%;
+  min-height: 190px;
+  flex: 1;
+  background: transparent;
+  border: 0;
+  color: #26251f;
+  padding: 24px 34px 32px;
+  font-family: 'Bricolage Grotesque', 'Noto Sans SC', sans-serif;
+}
+.hotel-site .template-section .template-copy strong {
+  display: block;
+  font:
+    600 24px/1.2 'Bricolage Grotesque',
+    'Noto Sans SC',
+    sans-serif;
+  letter-spacing: -0.03em;
+  margin: 0;
+  text-transform: none;
+}
+.hotel-site .template-section .template-copy > span:not(.selected-chip) {
+  color: #68626a;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 12px 0 20px;
+  max-width: 420px;
+}
+.hotel-site .template-section .template-copy small {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: #26251f;
+  border: 1px solid #26251f50;
+  border-radius: 999px;
+  background: transparent;
+  font:
+    500 12px/1.3 'Bricolage Grotesque',
+    sans-serif;
+  padding: 10px 16px;
+  margin-top: auto;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.hotel-site .template-section .template-copy:hover small {
+  background: #26251f;
+  color: #fff;
+}
+.hotel-site .template-section .selected-chip {
+  position: static;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #5e5864;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  margin: 0 0 12px;
+  transform: none;
+}
+.hotel-site .template-section .template-card:first-child .template-media {
+  padding: 44px;
+}
+.hotel-site .template-section .template-card:first-child .template-copy {
+  min-height: 300px;
+  padding: 40px 40px 40px 8px;
+  justify-content: center;
+}
+.hotel-site .template-section .template-card:first-child .template-copy strong {
+  font-size: 36px;
+}
+.hotel-site .template-section .template-card:first-child .template-copy small {
+  margin-top: 12px;
+}
+.hotel-site .template-section button:focus-visible,
+.studio-theme-modal button:focus-visible,
+.studio-theme-modal video:focus-visible {
+  outline: 3px solid #a54b25;
+  outline-offset: 4px;
+}
+.studio-theme-modal.template-modal {
+  background: rgb(22 26 36 / 70%);
+  backdrop-filter: blur(6px);
+  padding: 24px;
+  font-family: 'Bricolage Grotesque', sans-serif;
+}
+.studio-theme-modal .template-modal-card {
+  width: min(960px, 100%);
+  max-height: calc(100dvh - 48px);
+  border: 1px solid #d6d2ca;
+  border-radius: 24px;
+  color: #161a24;
+  background: #fffaf3;
+  box-shadow: 0 24px 80px #161a2429;
+  overflow: auto;
+}
+.studio-theme-modal .modal-close {
+  width: 44px;
+  height: 44px;
+  top: 12px;
+  right: 12px;
+  border: 1px solid #d6d2ca;
+  color: #161a24;
+  background: #fffaf3;
+  cursor: pointer;
+  box-shadow: none;
+}
+.studio-theme-modal .landscape-player {
+  aspect-ratio: 16 / 9;
+  max-height: 65vh;
+  border-bottom: 2px solid #161a24;
+}
+.studio-theme-modal .landscape-player video {
+  max-height: 65vh;
+  object-fit: contain;
+}
+.studio-theme-modal .template-modal-copy {
+  padding: 24px;
+}
+.studio-theme-modal .template-modal-copy h3 {
+  margin: 8px 0;
+  color: #161a24;
+  font:
+    800 28px/1.15 Fraunces,
+    serif;
+  text-transform: none;
+  letter-spacing: -0.025em;
+}
+.studio-theme-modal .template-modal-copy p {
+  color: #555862;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.studio-theme-modal .template-modal-copy small {
+  color: #555862;
+  font:
+    700 12px/1.4 'Bricolage Grotesque',
+    sans-serif;
+  text-transform: none;
+}
+.studio-theme-modal .template-modal-copy .hero-primary {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 12px 18px;
+  border: 1px solid #d6d2ca;
+  border-radius: 999px;
+  color: #161a24;
+  background: #26251f;
+  box-shadow: none;
+  font:
+    700 14px/1.25 'Bricolage Grotesque',
+    sans-serif;
+  text-transform: none;
+}
+
+@media (max-width: 900px) {
+  .hotel-site .template-section .template-card:first-child {
+    display: flex;
+    grid-column: 1 / -1;
+  }
+  .hotel-site .template-section .template-card:first-child .template-media {
+    padding: 32px 32px 12px;
+  }
+  .hotel-site .template-section .template-card:first-child .template-copy {
+    min-height: 0;
+    padding: 20px 32px 32px;
+  }
+  .hotel-site
+    .template-section
+    .template-card:first-child
+    .template-copy
+    strong {
+    font-size: 28px;
+  }
+}
+@media (max-width: 600px) {
+  .hotel-site .template-section {
+    margin: 48px auto;
+  }
+  .hotel-site .template-section .template-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .hotel-site .template-section .template-card:first-child {
+    grid-column: auto;
+  }
+  .hotel-site .template-section .template-media,
+  .hotel-site .template-section .template-card:first-child .template-media {
+    padding: 24px 24px 6px;
+  }
+  .hotel-site .template-section .template-copy,
+  .hotel-site .template-section .template-card:first-child .template-copy {
+    padding: 24px;
+    min-height: 0;
+  }
+  .hotel-site .template-section .template-copy strong,
+  .hotel-site
+    .template-section
+    .template-card:first-child
+    .template-copy
+    strong {
+    font-size: 24px;
+  }
+  .studio-theme-modal.template-modal {
+    padding: 12px;
+  }
+  .studio-theme-modal .template-modal-card {
+    max-height: calc(100dvh - 24px);
+  }
+  .studio-theme-modal .template-modal-copy {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    padding: 20px;
+  }
+  .studio-theme-modal .template-modal-copy .hero-primary {
+    width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hotel-site .template-section .template-card,
+  .hotel-site .template-section .template-preview-target {
+    transition: none;
+  }
+}
+
+.studio-theme-modal .template-modal-copy .hero-primary {
+  color: #fff;
+}
+
+.hotel-site #templates {
+  scroll-margin-top: 100px;
+}

@@ -68,3 +68,7 @@ package-lock.json
 
 # Local pnpm package cache
 .pnpm-store/
+
+# Local browser reference captures (not product assets)
+/docs/design-references/raindance-desktop.png
+/docs/design-references/raindance-mobile.png

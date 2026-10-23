@@ -16,8 +16,11 @@ import { Link, useRouter } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
 import { VIDEO_CREDIT_COST } from '@/config/video';
 import { apiGet, apiPost } from '@/lib/api-client';
+import { cn } from '@/lib/utils';
 import { videoGenerationAction } from '@/lib/video-generation-action';
 import { m } from '@/paraglide/messages.js';
+
+import '@/styles/raindance-generator.css';
 
 interface Photo {
   url: string;
@@ -32,6 +35,8 @@ export function HotelGenerator({
   onGenerated: (track: HotelTrack, quality: string, videoUrl?: string) => void;
 }) {
   const id = useId();
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
   const [photos, setPhotos] = useState<[Photo | null, Photo | null]>([
     null,
     null,
@@ -260,254 +265,285 @@ export function HotelGenerator({
 
   return (
     <section
-      className="studio-section container"
+      className="rd-generator container"
       id="video-generator"
       aria-labelledby={`${id}-heading`}
     >
-      <div className="studio-shell">
-        <div className="studio-heading">
-          <div>
-            <span className="eyebrow">YOUR DUO. YOUR STAGE.</span>
-            <h2 id={`${id}-heading`}>
-              {m['hotel.generator.heading']({ app: envConfigs.app_name })}
-            </h2>
-            <p>{m['hotel.copy.choose_a_scene_add_two_photos_093']()}</p>
-            <p className="privacy-note">
-              {m['hotel.generator.model_disclosure']()}
-            </p>
+      <div className="rd-generator-shell">
+        <h2 className="sr-only" id={`${id}-heading`}>
+          {m['hotel.generator.heading']({ app: envConfigs.app_name })}
+        </h2>
+        <header className="rd-generator-heading">
+          <div className="rd-generator-stickers">
+            <span className="rd-generator-sticker">
+              {m['hotel.redesign.two_photos']()}
+            </span>
+            <span className="rd-generator-sticker">
+              {m['hotel.redesign.full_length']()}
+            </span>
           </div>
-          <div className="selected-template-mini">
-            <img src={selected.image} alt="" width={1280} height={720} />
-            <div>
-              <span>{m['hotel.copy.selected_template_094']()}</span>
+          {session?.user && (
+            <Link href="/settings/credits" className="rd-generator-balance">
+              {m['settings.credits.balance']()}
+              {' · '}
+              {balanceQuery.isSuccess
+                ? m['hotel.generator.credit_count']({
+                    count: balanceQuery.data.balance,
+                  })
+                : balanceQuery.isError
+                  ? '-'
+                  : '…'}
+            </Link>
+          )}
+        </header>
+        <div className="rd-generator-grid">
+          <div className="rd-generator-photos">
+            <div className="rd-upload-grid">
+              {([0, 1] as const).map((slot) => (
+                <div
+                  className={cn('rd-upload-bay', {
+                    'is-filled': !!photos[slot],
+                  })}
+                  key={slot}
+                >
+                  <input
+                    className="rd-upload-input"
+                    id={`${id}-photo-${slot}`}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    disabled={busy}
+                    aria-label={m['hotel.copy.add_a_photo_for_person_098']({
+                      number: slot + 1,
+                    })}
+                    aria-describedby={`${id}-error-${slot}`}
+                    onChange={(event) => {
+                      choosePhoto(event.currentTarget.files?.[0], slot);
+                      event.currentTarget.value = '';
+                    }}
+                  />
+                  <label
+                    className="rd-upload-label"
+                    htmlFor={`${id}-photo-${slot}`}
+                    tabIndex={busy ? -1 : 0}
+                    role="button"
+                    aria-disabled={busy}
+                    aria-label={m[
+                      'hotel.copy.add_or_replace_the_photo_for_099'
+                    ]({ number: slot + 1 })}
+                    onKeyDown={(event) => {
+                      if (
+                        !busy &&
+                        (event.key === 'Enter' || event.key === ' ')
+                      ) {
+                        event.preventDefault();
+                        document.getElementById(`${id}-photo-${slot}`)?.click();
+                      }
+                    }}
+                  >
+                    {photos[slot] && (
+                      <img
+                        src={photos[slot].url}
+                        alt={m['hotel.copy.local_photo_preview_for_person_100'](
+                          { number: slot + 1 }
+                        )}
+                      />
+                    )}
+                    <div className="rd-upload-copy">
+                      <ImagePlus size={30} aria-hidden="true" />
+                      <span className="rd-upload-person">
+                        {m['hotel.copy.person_101']()} {slot + 1}
+                      </span>
+                      <strong>
+                        {photos[slot]?.name ||
+                          m['hotel.copy.click_to_add_a_photo_102']()}
+                      </strong>
+                      <span>
+                        {photos[slot]
+                          ? m['hotel.copy.click_to_replace_the_photo_103']()
+                          : m['hotel.copy.jpg_png_webp_max_8_mb_104']()}
+                      </span>
+                    </div>
+                  </label>
+                  {photos[slot] && (
+                    <button
+                      className="rd-remove-upload"
+                      type="button"
+                      disabled={busy}
+                      aria-label={m[
+                        'hotel.copy.remove_the_photo_for_person_105'
+                      ]({ number: slot + 1 })}
+                      onClick={() => {
+                        const next: [Photo | null, Photo | null] = [...photos];
+                        next[slot] = null;
+                        updatePhotos(next);
+                      }}
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
+                  <span
+                    className="rd-upload-error"
+                    id={`${id}-error-${slot}`}
+                    role="alert"
+                  >
+                    {errors[slot]}
+                  </span>
+                </div>
+              ))}
+              <button
+                type="button"
+                className="rd-swap-button"
+                aria-label={m['hotel.copy.swap_the_two_photos_097']()}
+                disabled={busy || (!photos[0] && !photos[1])}
+                onClick={() => {
+                  updatePhotos([photos[1], photos[0]]);
+                  setErrors([errors[1], errors[0]]);
+                }}
+              >
+                <ArrowLeftRight size={18} />
+              </button>
+            </div>
+          </div>
+          <aside className="rd-generator-output rd-generator-card">
+            <div className="rd-output-heading">
+              <h3>{m['hotel.redesign.output']()}</h3>
+              {!videoUrl && (
+                <span className="rd-generator-sticker">
+                  {m['hotel.redesign.example']()}
+                </span>
+              )}
+            </div>
+            <video
+              key={videoUrl || selected.id}
+              src={videoUrl || selected.video}
+              poster={videoUrl ? undefined : selected.image}
+              controls
+              playsInline
+              preload="none"
+              aria-label={videoUrl ? m['video.complete']() : selected.title}
+            />
+            <div className="rd-output-copy">
               <strong>{selected.title}</strong>
+              {videoUrl ? (
+                <a href={videoUrl} target="_blank" rel="noopener noreferrer">
+                  {m['video.open']()}
+                </a>
+              ) : (
+                <>
+                  <p>{m['hotel.seo.preview_disclosure']()}</p>
+                  <Link href="/#templates">
+                    {m['hotel.redesign.template_selected']()} →
+                  </Link>
+                </>
+              )}
+            </div>
+          </aside>
+          <div className="rd-generator-details">
+            <div className="rd-generator-card rd-generator-tips">
+              <h3>{m['hotel.redesign.best_result']()}</h3>
+              <ul>
+                {[
+                  m['hotel.copy.one_subject_per_photo_033'](),
+                  m['hotel.copy.face_forward_or_slightly_to_the_034'](),
+                  m[
+                    'hotel.copy.use_original_photos_rather_than_screenshots_036'
+                  ](),
+                ].map((tip) => (
+                  <li key={tip}>
+                    <Check size={15} aria-hidden="true" />
+                    <span>{tip}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="rd-generator-card rd-generator-quality">
+              <h3>{m['hotel.redesign.quality']()}</h3>
+              <div className="rd-quality-summary">
+                <div>
+                  <span>{m['hotel.copy.selected_resolution_112']()}</span>
+                  <strong>{quality}</strong>
+                </div>
+                <div>
+                  <span>{m['video.duration']()}</span>
+                  <strong>15s</strong>
+                </div>
+                <div>
+                  <span>{m['video.cost_label']()}</span>
+                  <strong>
+                    {m['video.cost']({ credits: VIDEO_CREDIT_COST })}
+                  </strong>
+                </div>
+              </div>
+              <p>{m['hotel.generator.model_disclosure']()}</p>
             </div>
           </div>
         </div>
-        <div className="studio-body">
-          <div className="studio-upload-pane">
-            <div className="studio-step-label">
-              <span>01</span>
-              <div>
-                <strong>{m['hotel.copy.upload_your_duo_095']()}</strong>
-                <small>
-                  {m['hotel.copy.clear_frontfacing_photos_work_best_096']()}
-                </small>
-              </div>
-            </div>
-            <div className="upload-grid">
-              {([0, 1] as const).map((slot) => (
-                <div key={slot} style={{ display: 'contents' }}>
-                  {slot === 1 && (
-                    <button
-                      type="button"
-                      className="swap-button"
-                      aria-label={m['hotel.copy.swap_the_two_photos_097']()}
-                      disabled={busy || (!photos[0] && !photos[1])}
-                      onClick={() => {
-                        updatePhotos([photos[1], photos[0]]);
-                        setErrors([errors[1], errors[0]]);
-                      }}
-                    >
-                      <ArrowLeftRight size={18} />
-                    </button>
-                  )}
-                  <div className={`upload-bay${photos[slot] ? 'filled' : ''}`}>
-                    <input
-                      className="upload-input"
-                      style={{ position: 'absolute', width: 1, height: 1 }}
-                      id={`${id}-photo-${slot}`}
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      disabled={busy}
-                      aria-label={m['hotel.copy.add_a_photo_for_person_098']({
-                        number: slot + 1,
-                      })}
-                      aria-describedby={`${id}-error-${slot}`}
-                      onChange={(event) => {
-                        choosePhoto(event.currentTarget.files?.[0], slot);
-                        event.currentTarget.value = '';
-                      }}
-                    />
-                    <label
-                      className="upload-label"
-                      htmlFor={`${id}-photo-${slot}`}
-                      tabIndex={busy ? -1 : 0}
-                      role="button"
-                      aria-label={m[
-                        'hotel.copy.add_or_replace_the_photo_for_099'
-                      ]({ number: slot + 1 })}
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter' || event.key === ' ') {
-                          event.preventDefault();
-                          document
-                            .getElementById(`${id}-photo-${slot}`)
-                            ?.click();
-                        }
-                      }}
-                    >
-                      {photos[slot] && (
-                        <img
-                          src={photos[slot].url}
-                          alt={m[
-                            'hotel.copy.local_photo_preview_for_person_100'
-                          ]({ number: slot + 1 })}
-                        />
-                      )}
-                      <div className="upload-copy">
-                        <span className="field-title">
-                          {m['hotel.copy.person_101']()}
-                          {slot + 1}
-                        </span>
-                        <ImagePlus size={30} aria-hidden="true" />
-                        <strong>
-                          {photos[slot]?.name ||
-                            m['hotel.copy.click_to_add_a_photo_102']()}
-                        </strong>
-                        <span>
-                          {photos[slot]
-                            ? m['hotel.copy.click_to_replace_the_photo_103']()
-                            : m['hotel.copy.jpg_png_webp_max_8_mb_104']()}
-                        </span>
-                      </div>
-                    </label>
-                    {photos[slot] && (
-                      <button
-                        className="remove-upload"
-                        type="button"
-                        disabled={busy}
-                        aria-label={m[
-                          'hotel.copy.remove_the_photo_for_person_105'
-                        ]({ number: slot + 1 })}
-                        onClick={() => {
-                          const next: [Photo | null, Photo | null] = [
-                            ...photos,
-                          ];
-                          next[slot] = null;
-                          updatePhotos(next);
-                        }}
-                      >
-                        <X size={16} />
-                      </button>
-                    )}
-                    <span
-                      className="upload-error"
-                      id={`${id}-error-${slot}`}
-                      role="alert"
-                    >
-                      {errors[slot]}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <p className="privacy-note">
-              <ShieldCheck size={16} />
-              {m['hotel.copy.local_preview_only_photos_are_not_106']()}
-            </p>
-          </div>
-          <div className="studio-settings-pane">
-            <label className="consent-row">
-              <input
-                type="checkbox"
-                checked={consent}
-                disabled={busy}
-                onChange={(event) => setConsent(event.currentTarget.checked)}
-              />
-              <span className="check-box" aria-hidden="true">
-                {consent && <Check size={12} />}
-              </span>
-              <span>
-                {m['hotel.copy.i_have_permission_to_use_these_111']()}
-              </span>
-            </label>
-            <div className="action-summary">
-              <div>
-                <span>{m['hotel.copy.selected_resolution_112']()}</span>
-                <strong>{quality}</strong>
-              </div>
-              <div>
-                <span>{m['video.duration']()}</span>
-                <strong>15s</strong>
-              </div>
-              <div>
-                <span>{m['video.cost_label']()}</span>
-                <strong>
-                  {m['video.cost']({ credits: VIDEO_CREDIT_COST })}
-                </strong>
-              </div>
-              <small>
-                {m['hotel.copy.the_demo_does_not_spend_credits_114']()}
-              </small>
-            </div>
-            <button
-              className="primary-action"
-              type="button"
-              disabled={action === 'wait' || action === 'prepare-photos'}
-              onClick={generate}
-            >
-              {busy ? (
-                <LoaderCircle className="animate-spin" size={18} />
-              ) : (
-                <Sparkles size={18} />
-              )}
-              {busy
+        <div className="rd-generator-bottom">
+          <p className="rd-generator-privacy">
+            <ShieldCheck size={16} aria-hidden="true" />
+            {m['hotel.copy.local_preview_only_photos_are_not_106']()}
+          </p>
+          <label className="rd-generator-consent">
+            <input
+              type="checkbox"
+              checked={consent}
+              disabled={busy}
+              onChange={(event) => setConsent(event.currentTarget.checked)}
+            />
+            <span>{m['hotel.copy.i_have_permission_to_use_these_111']()}</span>
+          </label>
+          <button
+            className="rd-generator-action"
+            type="button"
+            disabled={
+              !hydrated || action === 'wait' || action === 'prepare-photos'
+            }
+            onClick={generate}
+          >
+            {busy ? (
+              <LoaderCircle className="animate-spin" size={18} />
+            ) : (
+              <Sparkles size={18} />
+            )}
+            {!hydrated
+              ? m['common.pricing.processing']()
+              : busy
                 ? m['hotel.copy.preparing_demo_115']()
                 : action === 'retry-balance'
                   ? m['video.retry_balance']()
-                  : m['hotel.copy.run_demo_116']()}
-            </button>
-            {session?.user && balanceQuery.isSuccess && !hasCredits && (
-              <p className="studio-foot">
-                {m['video.insufficient_credits']()}{' '}
-                <Link href="/pricing" className="studio-account-action">
-                  {m['video.buy_credits']()}
-                </Link>
-              </p>
-            )}
-            <p className="studio-foot">
-              {m['hotel.copy.add_two_photos_and_confirm_permission_117']()}
-              {!session?.user && (
-                <Link
-                  href="/sign-in?callbackUrl=%2F%23video-generator"
-                  className="studio-account-action"
-                >
-                  {' '}
-                  {m['video.sign_in']()}
-                </Link>
-              )}
+                  : action === 'sign-in'
+                    ? m['video.sign_in']()
+                    : action === 'buy-credits'
+                      ? m['video.buy_credits']()
+                      : m['hotel.copy.run_demo_116']()}
+          </button>
+          {session?.user && balanceQuery.isSuccess && !hasCredits && (
+            <p className="rd-generator-foot">
+              {m['video.insufficient_credits']()}{' '}
+              <Link href="/pricing">{m['video.buy_credits']()}</Link>
             </p>
-            <p className="studio-foot">
-              <Link href="/terms-of-service">
-                {m['hotel.generator.content_standards']()}
+          )}
+          <p className="rd-generator-foot">
+            {m['hotel.copy.add_two_photos_and_confirm_permission_117']()}
+            {!session?.user && (
+              <Link href="/sign-in?callbackUrl=%2F%23video-generator">
+                {' '}
+                {m['video.sign_in']()}
               </Link>
-              {' · '}
-              <a href="mailto:2670855280@qq.com?subject=HotelLobby%20Content%20Report">
-                {m['hotel.generator.report_content']()}
-              </a>
-            </p>
-            <p role="status" aria-live="polite" className="privacy-note">
-              {result}
-            </p>
-            {videoUrl && (
-              <div className="space-y-3">
-                <video
-                  src={videoUrl}
-                  controls
-                  playsInline
-                  className="w-full rounded-xl"
-                />
-                <a
-                  href={videoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline"
-                >
-                  {m['video.open']()}
-                </a>
-              </div>
             )}
-          </div>
+          </p>
+          <p className="rd-generator-foot">
+            <Link href="/terms-of-service">
+              {m['hotel.generator.content_standards']()}
+            </Link>
+            {' · '}
+            <a href="mailto:2670855280@qq.com?subject=HotelLobby%20Content%20Report">
+              {m['hotel.generator.report_content']()}
+            </a>
+          </p>
+          <p role="status" aria-live="polite" className="rd-generator-status">
+            {result}
+          </p>
         </div>
       </div>
     </section>

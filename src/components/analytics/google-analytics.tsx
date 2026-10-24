@@ -20,7 +20,7 @@ export function GoogleAnalytics({ measurementId }: { measurementId: string }) {
         id="ga-init"
         async
         dangerouslySetInnerHTML={{
-          __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());var ignoreAuthReferrer=false;try{ignoreAuthReferrer=new URL(document.referrer).hostname==='accounts.google.com';}catch{}gtag('config','${measurementId}',{ignore_referrer:ignoreAuthReferrer});`,
+          __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());var ignoreAuthReferrer=false;try{ignoreAuthReferrer=new URL(document.referrer).hostname==='accounts.google.com';}catch{}gtag('config','${measurementId}',{ignore_referrer:ignoreAuthReferrer});window.dispatchEvent(new Event('hotel:analytics-ready'));`,
         }}
       />
     </>

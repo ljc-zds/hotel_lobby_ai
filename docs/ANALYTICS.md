@@ -10,7 +10,9 @@ The production app records three server-confirmed events:
 
 Events are stored in the existing config table under `conversion:` keys, using stable source keys for deduplication. Payment events are written inside the fulfillment transaction. No new database migration is required. Only an anonymous event name and a random delivery nonce are queued in GA4; account identifiers, order numbers, amounts, currency, products, images and prompts are not transmitted. This tracks payment counts, not ecommerce revenue.
 
-The signed-in browser polls `/api/analytics`, sends pending events to the configured GA4 property, and acknowledges them. Persistent browser deduplication and server acknowledgements prevent ordinary refresh/retry duplicates. Multiple devices or storage restrictions may still duplicate non-purchase events. Acknowledgement confirms queueing in `gtag`, not Google's receipt; ad blockers, DNT and a customer never returning after an asynchronous payment can prevent GA4 reporting. Server conversion counts remain in `/admin/traffic`. Events start with this release; old accounts/orders/tasks are not backfilled.
+The signed-in browser checks `/api/analytics` on mount/login, navigation (including checkout returns), returning to the page, reconnecting, and successful video-task creation. It does not poll on a timer. Pending events are sent to the configured GA4 property and acknowledged. If GA initializes after a query finishes, its readiness event resumes delivery without another query. Delayed payment webhooks are picked up at the next navigation, page return or reconnect; this is not server push. Persistent browser deduplication and server acknowledgements prevent ordinary refresh/retry duplicates. Multiple devices or storage restrictions may still duplicate non-purchase events. Acknowledgement confirms queueing in `gtag`, not Google's receipt; ad blockers, DNT and a customer never returning after an asynchronous payment can prevent GA4 reporting. Server conversion counts remain in `/admin/traffic`. Events start with this release; old accounts/orders/tasks are not backfilled.
+
+The video library polls every 10 seconds only on My videos while a returned task is `pending` or `processing`. Empty lists and lists containing only terminal tasks stop polling. A successful task submission invalidates the library immediately so a cached empty list can discover the new task.
 
 The tag ignores `accounts.google.com` referrers, so OAuth return traffic does not replace the original acquisition source. Internal traffic exclusions require a verified internal IP/filter and are not guessed automatically.
 
@@ -21,3 +23,5 @@ Property `558301958` uses `sign_up`, `start_video` and `payment_success` as key 
 ## Verification
 
 With the local SQLite schema selected, run `node --import tsx scripts/check-conversion-events.ts`. It creates a disposable temporary database and verifies deduplication, account isolation, anonymous payloads and acknowledgements, without touching production or initiating paid generation/checkout. Verify `pnpm build` afterward.
+
+Run `pnpm exec tsx scripts/check-hotel-query-policy.ts` to check conditional library polling and event-triggered query refreshes without network requests or a database.

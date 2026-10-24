@@ -22,6 +22,7 @@ import { envConfigs } from '@/config';
 import { hotelPacks } from '@/config/hotel-packs';
 import { publicVideoExample } from '@/config/public-example';
 import { apiGet, apiPost } from '@/lib/api-client';
+import { videoListPollingInterval } from '@/lib/hotel-query-policy';
 import { m } from '@/paraglide/messages.js';
 import { getLocale } from '@/paraglide/runtime.js';
 import { HotelActualExample } from '@/blocks/hotel-actual-example';
@@ -59,7 +60,8 @@ export function HotelSite({
     queryKey: ['hotel-videos', session?.user?.id],
     queryFn: () => apiGet<VideoOrder[]>('/api/video'),
     enabled: !!session?.user,
-    refetchInterval: page === 'orders' ? 10_000 : false,
+    refetchInterval: (query) =>
+      videoListPollingInterval(page === 'orders', query.state.data),
   });
   const orders: VideoOrder[] = session?.user ? (videoQuery.data ?? []) : [];
   const router = useRouter();

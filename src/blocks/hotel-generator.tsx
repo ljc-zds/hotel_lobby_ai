@@ -16,6 +16,7 @@ import { Link, useRouter } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
 import { VIDEO_CREDIT_COST } from '@/config/video';
 import { apiGet, apiPost } from '@/lib/api-client';
+import { conversionQueryKey } from '@/lib/hotel-query-policy';
 import { cn } from '@/lib/utils';
 import { videoGenerationAction } from '@/lib/video-generation-action';
 import { m } from '@/paraglide/messages.js';
@@ -140,6 +141,12 @@ export function HotelGenerator({
         images,
       }),
     onSuccess: (data: { id: string }) => {
+      void queryClient.invalidateQueries({
+        queryKey: conversionQueryKey(session?.user?.id),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ['hotel-videos', session?.user?.id],
+      });
       void queryClient.invalidateQueries({
         queryKey: ['hotel-credit-balance'],
       });

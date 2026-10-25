@@ -28,6 +28,26 @@ function ensureCloudflareEnv(): Promise<void> {
 // getLocale() resolves per-request (AsyncLocalStorage) during SSR.
 export default {
   async fetch(req: Request): Promise<Response> {
+    // WordPress probes must not render our 404 shell: its root loader reads DB config.
+    let pathname = new URL(req.url).pathname;
+    try {
+      pathname = decodeURIComponent(pathname);
+    } catch {
+      return new Response('Bad Request', { status: 400 });
+    }
+    if (
+      /^\/(?:wp-admin(?:\/|$)|wp-login\.php(?:\/|$)|xmlrpc\.php(?:\/|$))/i.test(
+        pathname
+      )
+    ) {
+      return new Response(req.method === 'HEAD' ? null : 'Not Found', {
+        status: 404,
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'no-store',
+        },
+      });
+    }
     await ensureCloudflareEnv();
     const response = await paraglideMiddleware(req, () => handler.fetch(req));
     const utmSource = new URL(req.url).searchParams.get('utm_source');

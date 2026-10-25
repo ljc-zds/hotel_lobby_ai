@@ -12,12 +12,24 @@ export type ConfigMap = Record<string, string>;
 // In-memory cache
 let cachedConfigs: ConfigMap | null = null;
 let cacheTime = 0;
+let configVersion = 0;
+let pendingConfigs: Promise<ConfigMap> | null = null;
 const CACHE_TTL = 3600_000; // 1 hour
 
 /**
  * Get all configs from database.
  */
-export async function getDbConfigs(): Promise<ConfigMap> {
+export function getDbConfigs(): Promise<ConfigMap> {
+  if (pendingConfigs) return pendingConfigs;
+  const version = configVersion;
+  const pending = loadDbConfigs(version).finally(() => {
+    if (pendingConfigs === pending) pendingConfigs = null;
+  });
+  pendingConfigs = pending;
+  return pending;
+}
+
+async function loadDbConfigs(version: number): Promise<ConfigMap> {
   const now = Date.now();
   if (cachedConfigs && now - cacheTime < CACHE_TTL) {
     return cachedConfigs;
@@ -54,8 +66,10 @@ export async function getDbConfigs(): Promise<ConfigMap> {
       }
     }
 
-    cachedConfigs = result;
-    cacheTime = now;
+    if (version === configVersion) {
+      cachedConfigs = result;
+      cacheTime = now;
+    }
     return result;
   } catch {
     return {};
@@ -167,6 +181,8 @@ export async function saveConfigs(configs: ConfigMap) {
   });
 
   // Invalidate cache
+  configVersion++;
+  pendingConfigs = null;
   cachedConfigs = null;
   cacheTime = 0;
 }
@@ -291,6 +307,8 @@ export async function replaceCustomConfigs(
   });
 
   // Invalidate cache
+  configVersion++;
+  pendingConfigs = null;
   cachedConfigs = null;
   cacheTime = 0;
 }

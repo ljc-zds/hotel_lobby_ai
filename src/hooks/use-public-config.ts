@@ -12,6 +12,7 @@ export function usePublicConfig() {
     queryKey: ['public-config'],
     queryFn: () =>
       apiGet<PublicConfig>('/api/config/public', { cache: 'no-store' }),
-    staleTime: 0,
+    // Reuse within a minute; admin settings saves explicitly invalidate this key.
+    staleTime: 60_000,
   });
 }

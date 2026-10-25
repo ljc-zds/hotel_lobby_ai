@@ -5,6 +5,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import {
   createRootRoute,
   HeadContent,
+  notFound,
   Outlet,
   Scripts,
   type ErrorComponentProps,
@@ -53,6 +54,18 @@ const getAnalyticsConfigs = createServerFn().handler(async () => {
 });
 
 export const Route = createRootRoute({
+  beforeLoad: ({ matches }) => {
+    // Reject unmatched URLs before analytics/config loaders or child loaders run.
+    // Router versions in these projects expose either of these match flags.
+    if (
+      matches.some(
+        (match) =>
+          ('globalNotFound' in match && match.globalNotFound) ||
+          ('_notFound' in match && match._notFound)
+      )
+    )
+      throw notFound({ routeId: '__root__' });
+  },
   loader: () => getAnalyticsConfigs(),
   head: () => {
     // head() runs on the SSR server AND again on the client during hydration.

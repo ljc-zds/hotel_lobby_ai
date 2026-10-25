@@ -14,6 +14,7 @@ export const Route = createFileRoute('/llms-full.txt')({
   server: {
     handlers: {
       GET: async () => {
+        let cacheable = true;
         const { app_url, app_name, app_description } = envConfigs;
 
         const lines: string[] = [
@@ -32,7 +33,10 @@ export const Route = createFileRoute('/llms-full.txt')({
         try {
           const { listPublishedArticles, findPublishedBySlug } =
             await import('@/modules/posts/service');
-          const rows = await listPublishedArticles().catch(() => []);
+          const rows = await listPublishedArticles().catch(() => {
+            cacheable = false;
+            return [];
+          });
           const dbPosts = rows.map((row) => ({
             slug: row.slug,
             title: row.title || row.slug,
@@ -54,7 +58,10 @@ export const Route = createFileRoute('/llms-full.txt')({
 
               if (post.source === 'db') {
                 const detail = await findPublishedBySlug(post.slug).catch(
-                  () => null
+                  () => {
+                    cacheable = false;
+                    return null;
+                  }
                 );
                 if (detail?.content) {
                   lines.push(detail.content, '');
@@ -65,6 +72,7 @@ export const Route = createFileRoute('/llms-full.txt')({
             }
           }
         } catch {
+          cacheable = false;
           // Database unreachable — list local posts without content.
           if (posts.length > 0) {
             lines.push('', '## Blog Posts', '');
@@ -81,7 +89,13 @@ export const Route = createFileRoute('/llms-full.txt')({
         lines.push('');
 
         return new Response(lines.join('\n'), {
-          headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+          headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+            // Public crawler output only; never cache a database outage fallback.
+            'Cache-Control': cacheable
+              ? 'public, max-age=0, s-maxage=600, stale-while-revalidate=60'
+              : 'no-store',
+          },
         });
       },
     },

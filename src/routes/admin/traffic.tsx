@@ -16,7 +16,9 @@ function TrafficPage() {
   const query = useQuery({
     queryKey: ['admin-traffic'],
     queryFn: () => apiGet<Report>('/api/admin/traffic'),
-    refetchInterval: 60_000,
+    // Refresh on user activity; an unattended dashboard must not keep Neon awake.
+    refetchInterval: false,
+    refetchOnWindowFocus: true,
   });
   return (
     <div className="space-y-6 p-6">

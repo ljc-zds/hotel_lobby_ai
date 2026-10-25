@@ -59,9 +59,13 @@ export function HotelSite({
   const videoQuery = useQuery({
     queryKey: ['hotel-videos', session?.user?.id],
     queryFn: () => apiGet<VideoOrder[]>('/api/video'),
-    enabled: !!session?.user,
+    enabled: !!session?.user && page === 'orders',
     refetchInterval: (query) =>
-      videoListPollingInterval(page === 'orders', query.state.data),
+      query.state.status === 'error'
+        ? false
+        : videoListPollingInterval(page === 'orders', query.state.data),
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true,
   });
   const orders: VideoOrder[] = session?.user ? (videoQuery.data ?? []) : [];
   const router = useRouter();

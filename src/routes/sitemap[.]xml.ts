@@ -54,6 +54,7 @@ export const Route = createFileRoute('/sitemap.xml')({
   server: {
     handlers: {
       GET: async () => {
+        let cacheable = true;
         const entries: Entry[] = STATIC_PATHS.map((path) => ({
           path,
           changeFrequency: path === '/blog' ? 'daily' : 'weekly',
@@ -64,7 +65,10 @@ export const Route = createFileRoute('/sitemap.xml')({
         try {
           const { listPublishedArticles } =
             await import('@/modules/posts/service');
-          const rows = await listPublishedArticles().catch(() => []);
+          const rows = await listPublishedArticles().catch(() => {
+            cacheable = false;
+            return [];
+          });
           const dbPosts = rows.map((row) => ({
             slug: row.slug,
             title: row.title || row.slug,
@@ -82,6 +86,7 @@ export const Route = createFileRoute('/sitemap.xml')({
             });
           }
         } catch {
+          cacheable = false;
           // Database unreachable — static paths + local posts still listed.
           for (const post of getLocalPosts(baseLocale)) {
             entries.push({
@@ -102,7 +107,13 @@ export const Route = createFileRoute('/sitemap.xml')({
         ].join('\n');
 
         return new Response(xml, {
-          headers: { 'Content-Type': 'application/xml' },
+          headers: {
+            'Content-Type': 'application/xml',
+            // Public crawler output only; never cache a database outage fallback.
+            'Cache-Control': cacheable
+              ? 'public, max-age=0, s-maxage=600, stale-while-revalidate=60'
+              : 'no-store',
+          },
         });
       },
     },

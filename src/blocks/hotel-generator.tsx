@@ -94,10 +94,13 @@ export function HotelGenerator({
     queryKey: ['video-task', session?.user?.id, taskId],
     queryFn: () => apiGet(`/api/video?id=${encodeURIComponent(taskId!)}`),
     enabled: !!taskId && !!session?.user,
-    refetchInterval: (query: { state: { data?: { status: string } } }) =>
+    refetchInterval: (query) =>
+      query.state.status !== 'error' &&
       ['pending', 'processing'].includes(query.state.data?.status || 'pending')
         ? 5000
         : false,
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true,
     retry: 2,
   });
   useEffect(() => {

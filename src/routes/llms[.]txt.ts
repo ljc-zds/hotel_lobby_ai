@@ -14,13 +14,17 @@ export const Route = createFileRoute('/llms.txt')({
   server: {
     handlers: {
       GET: async () => {
+        let cacheable = true;
         const { app_url, app_name, app_description } = envConfigs;
 
         let posts = getLocalPosts(baseLocale);
         try {
           const { listPublishedArticles } =
             await import('@/modules/posts/service');
-          const rows = await listPublishedArticles().catch(() => []);
+          const rows = await listPublishedArticles().catch(() => {
+            cacheable = false;
+            return [];
+          });
           const dbPosts = rows.map((row) => ({
             slug: row.slug,
             title: row.title || row.slug,
@@ -30,6 +34,7 @@ export const Route = createFileRoute('/llms.txt')({
           }));
           posts = mergePosts(dbPosts, posts);
         } catch {
+          cacheable = false;
           // Database unreachable — local posts still listed.
         }
 
@@ -57,7 +62,13 @@ export const Route = createFileRoute('/llms.txt')({
         lines.push('');
 
         return new Response(lines.join('\n'), {
-          headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+          headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+            // Public crawler output only; never cache a database outage fallback.
+            'Cache-Control': cacheable
+              ? 'public, max-age=0, s-maxage=600, stale-while-revalidate=60'
+              : 'no-store',
+          },
         });
       },
     },

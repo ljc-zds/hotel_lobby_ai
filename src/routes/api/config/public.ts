@@ -1,6 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-import { filterPublicConfigs, getAllConfigs } from '@/modules/config/service';
+import {
+  filterPublicConfigs,
+  getAllConfigs,
+  getFreshConfigs,
+} from '@/modules/config/service';
+import { readPublicCache } from '@/lib/public-cache.server';
 import { respData } from '@/lib/resp';
 
 const noStore = {
@@ -46,8 +51,8 @@ function isEmailSendingConfigured(configs: Record<string, string>): boolean {
   return !!configs.resend_api_key && !!configs.resend_sender_email;
 }
 
-async function GET({ request }: { request: Request }) {
-  const configs = await getAllConfigs();
+async function loadPublicConfigs(fresh = true) {
+  const configs = await (fresh ? getFreshConfigs() : getAllConfigs());
   const result = filterPublicConfigs(configs, publicKeys);
   // Expose readiness only; provider secrets never leave the server.
   for (const provider of ['google', 'github']) {
@@ -67,7 +72,16 @@ async function GET({ request }: { request: Request }) {
     configs.email_verification_enabled === 'true' && emailConfigured
       ? 'true'
       : 'false';
-  return respData(result, noStore);
+  return result;
+}
+
+async function GET() {
+  return respData(
+    await readPublicCache('settings', 'public-api', loadPublicConfigs).catch(
+      () => loadPublicConfigs(false)
+    ),
+    noStore
+  );
 }
 
 export const Route = createFileRoute('/api/config/public')({

@@ -4,6 +4,7 @@ import { db } from '@/core/db';
 import { envConfigs } from '@/config';
 import { config } from '@/config/db/schema';
 import { decryptSecret, encryptSecret, isEncryptedSecret } from '@/lib/crypto';
+import { mutatePublicCache, readPublicCache } from '@/lib/public-cache.server';
 
 import { getSettings } from './settings';
 
@@ -29,9 +30,12 @@ export function getDbConfigs(): Promise<ConfigMap> {
   return pending;
 }
 
-async function loadDbConfigs(version: number): Promise<ConfigMap> {
+async function loadDbConfigs(
+  version: number,
+  fresh = false
+): Promise<ConfigMap> {
   const now = Date.now();
-  if (cachedConfigs && now - cacheTime < CACHE_TTL) {
+  if (!fresh && cachedConfigs && now - cacheTime < CACHE_TTL) {
     return cachedConfigs;
   }
 
@@ -71,7 +75,8 @@ async function loadDbConfigs(version: number): Promise<ConfigMap> {
       cacheTime = now;
     }
     return result;
-  } catch {
+  } catch (error) {
+    if (fresh) throw error;
     return {};
   }
 }
@@ -147,44 +152,46 @@ export function isMaskedConfigValue(value: string): boolean {
  * encrypted at rest — see SECRET_SETTING_NAMES / SECRET_KEY_PATTERN.
  */
 export async function saveConfigs(configs: ConfigMap) {
-  const entries = await Promise.all(
-    Object.entries(configs)
-      .filter(
-        ([name, value]) =>
-          !PROTECTED_CONFIG_KEYS.has(name) && !isMaskedConfigValue(value)
-      )
-      .map(
-        async ([name, value]): Promise<[string, string]> =>
-          isSecretConfigKey(name)
-            ? [name, await encryptSecret(value)]
-            : [name, value]
-      )
-  );
-  if (entries.length === 0) {
-    return;
-  }
-
-  await db().transaction(async (tx: any) => {
-    for (const [name, value] of entries) {
-      const [existing] = await tx
-        .select()
-        .from(config)
-        .where(eq(config.name, name))
-        .limit(1);
-
-      if (existing) {
-        await tx.update(config).set({ value }).where(eq(config.name, name));
-      } else {
-        await tx.insert(config).values({ name, value });
-      }
+  return mutatePublicCache('settings', async () => {
+    const entries = await Promise.all(
+      Object.entries(configs)
+        .filter(
+          ([name, value]) =>
+            !PROTECTED_CONFIG_KEYS.has(name) && !isMaskedConfigValue(value)
+        )
+        .map(
+          async ([name, value]): Promise<[string, string]> =>
+            isSecretConfigKey(name)
+              ? [name, await encryptSecret(value)]
+              : [name, value]
+        )
+    );
+    if (entries.length === 0) {
+      return;
     }
-  });
 
-  // Invalidate cache
-  configVersion++;
-  pendingConfigs = null;
-  cachedConfigs = null;
-  cacheTime = 0;
+    await db().transaction(async (tx: any) => {
+      for (const [name, value] of entries) {
+        const [existing] = await tx
+          .select()
+          .from(config)
+          .where(eq(config.name, name))
+          .limit(1);
+
+        if (existing) {
+          await tx.update(config).set({ value }).where(eq(config.name, name));
+        } else {
+          await tx.insert(config).values({ name, value });
+        }
+      }
+    });
+
+    // Invalidate cache
+    configVersion++;
+    pendingConfigs = null;
+    cachedConfigs = null;
+    cacheTime = 0;
+  });
 }
 
 /**
@@ -258,59 +265,64 @@ export async function getCustomConfigs(): Promise<CustomConfig[]> {
 export async function replaceCustomConfigs(
   pairs: CustomConfig[]
 ): Promise<void> {
-  const reserved = reservedConfigKeys();
-  const seen = new Set<string>();
-  const clean: Array<[string, string]> = [];
+  return mutatePublicCache('settings', async () => {
+    const reserved = reservedConfigKeys();
+    const seen = new Set<string>();
+    const clean: Array<[string, string]> = [];
 
-  for (const pair of pairs) {
-    const key = (pair?.key ?? '').trim();
-    if (!key) continue; // skip blank rows
-    if (reserved.has(key)) throw new Error(`Reserved key not allowed: ${key}`);
-    if (!CUSTOM_KEY_PATTERN.test(key)) throw new Error(`Invalid key: ${key}`);
-    if (seen.has(key)) throw new Error(`Duplicate key: ${key}`);
-    seen.add(key);
-    clean.push([key, pair.value ?? '']);
-  }
-
-  const dbConfigs = await getDbConfigs();
-  const existingCustom = Object.keys(dbConfigs).filter((n) => !reserved.has(n));
-  const keep = new Set(clean.map(([k]) => k));
-  const toDelete = existingCustom.filter((k) => !keep.has(k));
-
-  const entries = await Promise.all(
-    clean
-      .filter(([, value]) => !isMaskedConfigValue(value))
-      .map(
-        async ([name, value]): Promise<[string, string]> =>
-          isSecretConfigKey(name)
-            ? [name, await encryptSecret(value)]
-            : [name, value]
-      )
-  );
-
-  await db().transaction(async (tx: any) => {
-    for (const name of toDelete) {
-      await tx.delete(config).where(eq(config.name, name));
+    for (const pair of pairs) {
+      const key = (pair?.key ?? '').trim();
+      if (!key) continue; // skip blank rows
+      if (reserved.has(key))
+        throw new Error(`Reserved key not allowed: ${key}`);
+      if (!CUSTOM_KEY_PATTERN.test(key)) throw new Error(`Invalid key: ${key}`);
+      if (seen.has(key)) throw new Error(`Duplicate key: ${key}`);
+      seen.add(key);
+      clean.push([key, pair.value ?? '']);
     }
-    for (const [name, value] of entries) {
-      const [existing] = await tx
-        .select()
-        .from(config)
-        .where(eq(config.name, name))
-        .limit(1);
-      if (existing) {
-        await tx.update(config).set({ value }).where(eq(config.name, name));
-      } else {
-        await tx.insert(config).values({ name, value });
+
+    const dbConfigs = await getDbConfigs();
+    const existingCustom = Object.keys(dbConfigs).filter(
+      (n) => !reserved.has(n)
+    );
+    const keep = new Set(clean.map(([k]) => k));
+    const toDelete = existingCustom.filter((k) => !keep.has(k));
+
+    const entries = await Promise.all(
+      clean
+        .filter(([, value]) => !isMaskedConfigValue(value))
+        .map(
+          async ([name, value]): Promise<[string, string]> =>
+            isSecretConfigKey(name)
+              ? [name, await encryptSecret(value)]
+              : [name, value]
+        )
+    );
+
+    await db().transaction(async (tx: any) => {
+      for (const name of toDelete) {
+        await tx.delete(config).where(eq(config.name, name));
       }
-    }
-  });
+      for (const [name, value] of entries) {
+        const [existing] = await tx
+          .select()
+          .from(config)
+          .where(eq(config.name, name))
+          .limit(1);
+        if (existing) {
+          await tx.update(config).set({ value }).where(eq(config.name, name));
+        } else {
+          await tx.insert(config).values({ name, value });
+        }
+      }
+    });
 
-  // Invalidate cache
-  configVersion++;
-  pendingConfigs = null;
-  cachedConfigs = null;
-  cacheTime = 0;
+    // Invalidate cache
+    configVersion++;
+    pendingConfigs = null;
+    cachedConfigs = null;
+    cacheTime = 0;
+  });
 }
 
 /**
@@ -328,4 +340,61 @@ export function filterPublicConfigs(
     }
   }
   return result;
+}
+
+// Fresh origin read only for sanitized public snapshots. Never cache this entire map.
+export async function getFreshConfigs(): Promise<ConfigMap> {
+  return { ...envConfigs, ...(await loadDbConfigs(configVersion, true)) };
+}
+export async function getDisplayConfigs(): Promise<ConfigMap> {
+  return readPublicCache('settings', 'display', async () => {
+    const configs = await getFreshConfigs();
+    return Object.fromEntries(
+      [
+        'google_analytics_id',
+        'plausible_domain',
+        'plausible_src',
+        'adsense_code',
+        'crisp_enabled',
+        'crisp_website_id',
+        'tawk_enabled',
+        'tawk_property_id',
+        'tawk_widget_id',
+        'cookie_consent_enabled',
+        'appearance_enabled',
+        'user_theme_enabled',
+        'app_color_mode',
+        'app_theme',
+        'app_font',
+        'app_font_size',
+        'app_sidebar_variant',
+        'app_sidebar_collapsible',
+        'guest_post_enabled',
+      ].map((key) => [key, configs[key] || ''])
+    );
+  }).catch(() =>
+    Object.fromEntries(
+      [
+        'google_analytics_id',
+        'plausible_domain',
+        'plausible_src',
+        'adsense_code',
+        'crisp_enabled',
+        'crisp_website_id',
+        'tawk_enabled',
+        'tawk_property_id',
+        'tawk_widget_id',
+        'cookie_consent_enabled',
+        'appearance_enabled',
+        'user_theme_enabled',
+        'app_color_mode',
+        'app_theme',
+        'app_font',
+        'app_font_size',
+        'app_sidebar_variant',
+        'app_sidebar_collapsible',
+        'guest_post_enabled',
+      ].map((key) => [key, (envConfigs as Record<string, string>)[key] || ''])
+    )
+  );
 }

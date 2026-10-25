@@ -3,6 +3,7 @@ import { and, count, desc, eq, like, or, type SQL } from 'drizzle-orm';
 import { db } from '@/core/db';
 import { post } from '@/config/db/schema';
 import { getUuid } from '@/lib/hash';
+import { mutatePublicCache, readPublicCache } from '@/lib/public-cache.server';
 
 export enum PostType {
   ARTICLE = 'article',
@@ -84,43 +85,79 @@ export async function list(params: {
 export async function listPublishedArticles(
   params: { limit?: number } = {}
 ): Promise<PublishedArticleItem[]> {
-  const { limit = 100 } = params;
-  return db()
-    .select({
-      id: post.id,
-      slug: post.slug,
-      title: post.title,
-      description: post.description,
-      image: post.image,
-      authorName: post.authorName,
-      authorImage: post.authorImage,
-      createdAt: post.createdAt,
-    })
-    .from(post)
-    .where(
-      and(
-        eq(post.type, PostType.ARTICLE),
-        eq(post.status, PostStatus.PUBLISHED)
+  return readPublicCache('posts', 'list:' + (params.limit ?? 100), async () => {
+    const { limit = 100 } = params;
+    return db()
+      .select({
+        id: post.id,
+        slug: post.slug,
+        title: post.title,
+        description: post.description,
+        image: post.image,
+        authorName: post.authorName,
+        authorImage: post.authorImage,
+        createdAt: post.createdAt,
+      })
+      .from(post)
+      .where(
+        and(
+          eq(post.type, PostType.ARTICLE),
+          eq(post.status, PostStatus.PUBLISHED)
+        )
       )
-    )
-    .orderBy(desc(post.createdAt))
-    .limit(limit);
+      .orderBy(desc(post.createdAt))
+      .limit(limit);
+  });
 }
 
 export async function findPublishedBySlug(
   slug: string
-): Promise<Post | undefined> {
-  const [result] = await db()
-    .select()
-    .from(post)
-    .where(
-      and(
-        eq(post.slug, slug.toLowerCase()),
-        eq(post.status, PostStatus.PUBLISHED)
+): Promise<
+  | Pick<
+      Post,
+      | 'id'
+      | 'slug'
+      | 'type'
+      | 'title'
+      | 'description'
+      | 'image'
+      | 'content'
+      | 'categories'
+      | 'authorName'
+      | 'authorImage'
+      | 'createdAt'
+      | 'updatedAt'
+      | 'status'
+    >
+  | undefined
+> {
+  return readPublicCache('posts', 'slug:' + slug.toLowerCase(), async () => {
+    const [result] = await db()
+      .select({
+        id: post.id,
+        slug: post.slug,
+        type: post.type,
+        title: post.title,
+        description: post.description,
+        image: post.image,
+        content: post.content,
+        categories: post.categories,
+        authorName: post.authorName,
+        authorImage: post.authorImage,
+        createdAt: post.createdAt,
+        updatedAt: post.updatedAt,
+        status: post.status,
+      })
+      .from(post)
+      .where(
+        and(
+          eq(post.slug, slug.toLowerCase()),
+          eq(post.status, PostStatus.PUBLISHED)
+        )
       )
-    )
-    .limit(1);
-  return result;
+      .limit(1);
+    return result;
+  });
 }
 
 export async function getById(id: string) {
@@ -143,21 +180,23 @@ export async function create(data: {
   authorName?: string;
   status?: string;
 }) {
-  const newPost: NewPost = {
-    id: getUuid(),
-    userId: data.userId,
-    slug: data.slug.toLowerCase(),
-    type: PostType.ARTICLE,
-    title: data.title,
-    description: data.description || '',
-    image: data.image || '',
-    content: data.content || '',
-    categories: data.categories || '',
-    authorName: data.authorName || '',
-    status: data.status || PostStatus.DRAFT,
-  };
-  const [result] = await db().insert(post).values(newPost).returning();
-  return result;
+  return mutatePublicCache('posts', async () => {
+    const newPost: NewPost = {
+      id: getUuid(),
+      userId: data.userId,
+      slug: data.slug.toLowerCase(),
+      type: PostType.ARTICLE,
+      title: data.title,
+      description: data.description || '',
+      image: data.image || '',
+      content: data.content || '',
+      categories: data.categories || '',
+      authorName: data.authorName || '',
+      status: data.status || PostStatus.DRAFT,
+    };
+    const [result] = await db().insert(post).values(newPost).returning();
+    return result;
+  });
 }
 
 export async function update(
@@ -173,19 +212,23 @@ export async function update(
     status?: string;
   }
 ) {
-  const updateData: any = { ...data };
-  if (updateData.slug) updateData.slug = updateData.slug.toLowerCase();
-  const [result] = await db()
-    .update(post)
-    .set(updateData)
-    .where(eq(post.id, id))
-    .returning();
-  return result;
+  return mutatePublicCache('posts', async () => {
+    const updateData: any = { ...data };
+    if (updateData.slug) updateData.slug = updateData.slug.toLowerCase();
+    const [result] = await db()
+      .update(post)
+      .set(updateData)
+      .where(eq(post.id, id))
+      .returning();
+    return result;
+  });
 }
 
 export async function remove(id: string) {
-  await db()
-    .update(post)
-    .set({ status: PostStatus.ARCHIVED })
-    .where(eq(post.id, id));
+  return mutatePublicCache('posts', async () => {
+    await db()
+      .update(post)
+      .set({ status: PostStatus.ARCHIVED })
+      .where(eq(post.id, id));
+  });
 }

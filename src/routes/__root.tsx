@@ -31,8 +31,8 @@ import '@/styles/globals.css';
 // Analytics IDs live in the DB config (1h-cached service). Fetched via a
 // server function so drizzle/db code never reaches the client bundle.
 const getAnalyticsConfigs = createServerFn().handler(async () => {
-  const { getAllConfigs } = await import('@/modules/config/service');
-  const configs = await getAllConfigs();
+  const { getDisplayConfigs } = await import('@/modules/config/service');
+  const configs = await getDisplayConfigs();
   return {
     gaId: configs.google_analytics_id?.trim() || '',
     plausibleDomain: configs.plausible_domain?.trim() || '',

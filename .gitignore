@@ -72,3 +72,6 @@ package-lock.json
 # Local browser reference captures (not product assets)
 /docs/design-references/raindance-desktop.png
 /docs/design-references/raindance-mobile.png
+
+# Build-time public route inventory.
+.static-pages.json

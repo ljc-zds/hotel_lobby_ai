@@ -106,8 +106,8 @@ export const Route = createFileRoute('/sitemap.xml')({
         return new Response(xml, {
           headers: {
             'Content-Type': 'application/xml',
-            // Shared public data cache owns freshness; do not add a second response cache.
-            'Cache-Control': 'no-store',
+            // Public metadata may stay at the edge for at most one minute after publication.
+            'Cache-Control': 'public, max-age=0, s-maxage=60',
           },
         });
       },
